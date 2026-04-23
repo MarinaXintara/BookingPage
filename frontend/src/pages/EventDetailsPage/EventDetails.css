@@ -1,0 +1,21 @@
+.event-details-container  {
+  max-height: 60vh;   
+  overflow-y: auto;    
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.event-details-container h1 {
+  font-family: 'Verdana', sans-serif;
+  color: #222;
+  margin-bottom: 0.5rem;
+}
+
+.event-details-info  {
+  
+  color: #333;
+  font-family: 'Verdana', sans-serifs;
+  font-size: 0.9rem;
+}

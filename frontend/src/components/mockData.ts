@@ -1,0 +1,72 @@
+export default [
+  {
+    eventId: "01",
+    title: "Πασχαλίδης",
+    category: "music",
+    eventType: "concert",
+    address: "Θέατρο Βράχων, Αθήνα",
+    geoLocation: { lat: 37.9833, lng: 23.7333 },
+    startDateTime: "2026-04-20T11:00:00",
+    endDateTime: "2026-04-20T20:00:00",
+    capacity: 5000,
+    ticketType: "standard",
+    booking: { available: 4000 },
+    priceTicket: 20.00
+  },
+  {
+    eventId: "02",
+    title: "Φοίνικας — Παναθηναϊκός",
+    category: "sports",
+    eventType: "basketball",
+    address: "ΟΑΚΑ, Αθήνα",
+    geoLocation: { lat: 38.0333, lng: 23.7833 },
+    startDateTime: "2026-04-20T11:00:00",
+    endDateTime: "2026-04-20T20:00:00",
+    capacity: 12000,
+    ticketType: "standard",
+    booking: { available: 3200 },
+    priceTicket: 15.00
+  },
+  {
+    eventId: "03",
+    title: "Έκθεση Σύγχρονης Τέχνης — Μορφές & Χρώμα",
+    category: "art",
+    eventType: "exhibition",
+    address: "ΕΜΣΤ, Αθήνα",
+    geoLocation: { lat: 37.9693, lng: 23.7289 },
+    startDateTime: "2026-04-20T11:00:00",
+    endDateTime: "2026-04-20T20:00:00",
+    capacity: 800,
+    ticketType: "standard",
+    booking: { available: 800 },
+    priceTicket: 0.00
+  },
+  {
+    eventId: "04",
+    title: "Hamlet — Εθνικό Θέατρο",
+    category: "theater",
+    eventType: "play",
+    address: "Εθνικό Θέατρο, Αθήνα",
+    geoLocation: { lat: 37.9812, lng: 23.7275 },
+    startDateTime: "2026-05-05T20:30:00",
+    endDateTime: "2026-05-05T23:00:00",
+    capacity: 600,
+    ticketType: "standard",
+    booking: { available: 120 },
+    priceTicket: 25.00
+  },
+  {
+    eventId: "05",
+    title: "Athens Marathon 2026",
+    category: "sports",
+    eventType: "marathon",
+    address: "Παναθηναϊκό Στάδιο, Αθήνα",
+    geoLocation: { lat: 37.9685, lng: 23.7412 },
+    startDateTime: "2026-11-08T09:00:00",
+    endDateTime: "2026-11-08T15:00:00",
+    capacity: 20000,
+    ticketType: "standard",
+    booking: { available: 11500 },
+    priceTicket: 35.00
+  }
+]

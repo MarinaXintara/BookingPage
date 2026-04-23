@@ -1,0 +1,48 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 350px;
+  margin: 50px auto;
+  padding: 30px;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Verdana', sans-serif;
+}
+
+input {
+  padding: 12px 15px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus {
+  border-color: #6d1313;
+  box-shadow: 0 0 8px rgba(240, 20, 31, 0.438);
+}
+
+button {
+  padding: 12px 20px;
+  font-size: 16px;
+  background: #943444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #943444;
+  
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
