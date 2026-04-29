@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { WebSocketServer, WebSocket } from "ws";
 import { createServer } from "http";
 import { randomUUID } from "crypto";
