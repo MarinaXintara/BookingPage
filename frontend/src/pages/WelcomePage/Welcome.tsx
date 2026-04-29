@@ -19,6 +19,8 @@ const Welcome: React.FC = () => {
 
             <div className="welcome-actions">
                 <button onClick={() => window.location.href = "/events"}>Search Events</button>
+                <button onClick={() => window.location.href = "/register"}>Register</button>
+                <button onClick={()=>window.location.href= "/login"}>Login</button>
             </div>
             {response}
         </div>
