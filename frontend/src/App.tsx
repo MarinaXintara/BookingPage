@@ -8,7 +8,7 @@ import { Home } from './pages/HomePage/Home.tsx';
 import EventPage from './pages/EventPage/EventPage.tsx';
 import EventDetailsPage from './pages/EventDetailsPage/EventDetails.tsx';
 import BookingPage from './pages/BookingPage/bookingPage.tsx';
-import BookingChat from './pages/Chat/Chat.tsx';
+import Messaging from './pages/Messaging/Messaging.tsx';
 
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />
         <Route path="/booking" element={<BookingPage />} />
-        <Route path="/chat" element={<BookingChat />} />
+        <Route path="/chat" element={<Messaging />} />
       </Routes>
     </BrowserRouter>
   );
