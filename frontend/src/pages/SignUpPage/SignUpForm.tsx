@@ -36,7 +36,17 @@ const Register: React.FC = () => {
             TIN: data.TIN,
         };
         console.log("Registering user: ", userData)
-        alert(`${data.firstName} ${data.lastName} has been successfully registered`);
+        fetch("http://localhost:8080/api/auth/register", {
+            method: "POST",
+            body: JSON.stringify(userData),
+            headers: {"Content-Type": "application/json"}})
+            .then(response => {
+                console.log(response);
+            if (response.ok) {
+                window.location.assign('/home')
+            }
+        })
+        .catch(error => console.log(error));
     }
 
 

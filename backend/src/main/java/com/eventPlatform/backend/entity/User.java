@@ -1,5 +1,6 @@
 package com.eventPlatform.backend.entity;
 
+import com.eventPlatform.backend.Util.HashUtil;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,23 +11,97 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String firstName;
+    private String lastName;
     private String email;
+    private String password;
+    private String phoneNumber;
+    private String address;
+    private String TIN;
+    private String  Role; //make this enum
 
     // Constructors
     public User() {}
 
-    public User(String name, String email) {
-        this.name = name;
+    public User(String firstName, String lastName, String email, String password,
+                String phoneNumber, String address, String TIN) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.TIN = TIN;
+        this.Role = "USER";
     }
 
     // Getters & Setters
-    public Long getId() { return id; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = HashUtil.sha256(password);
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getTIN() {
+        return TIN;
+    }
+
+    public void setTIN(String TIN) {
+        this.TIN = TIN;
+    }
+
+    public String getRole() {
+        return Role;
+    }
+
+    public void setRole(String Role) {
+        this.Role = Role;
+    }
 }
