@@ -17,18 +17,8 @@ const Login: React.FC = () => {
 
 
     const onSubmit = (data: LoginData) => {
+        fetch("http://localhost:8080/api/auth", {})
 
-
-        // dummy user login
-        if (data.email === "user@dummy.com" && data.password === "user123") {
-            localStorage.setItem("isLoggedIn", "true");
-            // navigate to protected home page after successful login
-            window.location.href = "/home";
-            return;
-        }
-
-        // TODO: send request to backend for authentication
-        alert("Email or Password does not match our records.");
 
     };
 
