@@ -19,14 +19,17 @@ const Login: React.FC = () => {
     const onSubmit = (data: LoginData) => {
         fetch("http://localhost:8080/api/auth/login", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        });
-
-
-    };
+            body: JSON.stringify(data),
+            headers: {"Content-Type": "application/json"}})
+            .then(response => {
+                console.log(response);
+            if (response.ok) {
+                window.location.assign('/home')
+            }
+        })
+        .catch(error => console.log(error));
+    }
+    
 
     return (
         <>
