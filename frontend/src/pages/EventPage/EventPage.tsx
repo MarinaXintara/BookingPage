@@ -1,4 +1,4 @@
-import SearchPage from '../../components/Search';
+import SearchPage from './Search';
 
 export default function EventPage() {
     return <div>

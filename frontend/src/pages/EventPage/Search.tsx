@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 // import mockData from './mockData';
-import GridCard from './GridCard';
+import GridCard from './EventGridCard';
 
 interface Event {
   eventId: string;
