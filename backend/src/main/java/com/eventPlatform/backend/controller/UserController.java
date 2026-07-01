@@ -23,6 +23,17 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Long id) {
+        User user = userService.findById(id);
+
+        if(user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        return user;
+    }
+
     @PostMapping
     public User createUser(@RequestBody User user) {
         return userService.saveUser(user);
@@ -57,8 +68,8 @@ public class UserController {
         if(user.getAddress() != null) {
             temp.setAddress(user.getAddress());
         }
-        if(user.getTIN() != null) {
-            temp.setTIN(user.getTIN());
+        if(user.getTin() != null) {
+            temp.setTin(user.getTin());
         }
         if(user.getRole() != null) {
             temp.setRole(user.getRole());

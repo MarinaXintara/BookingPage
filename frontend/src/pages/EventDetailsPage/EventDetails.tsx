@@ -1,18 +1,47 @@
-// Source - https://stackoverflow.com/a/4293047
-// Posted by Sandeep, modified by community. See post 'Timeline' for change history
-// Retrieved 2026-04-01, License - CC BY-SA 3.0
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import mockData from "../../components/mockData";
+import { fetchEvent, type Event } from "../EventPage/eventApi";
 import './EventDetails.css';
 
 
 
 export default function EventDetailsPage() {
   const { eventId } = useParams<{ eventId: string }>();
-  const event = mockData.find((e) => String(e.eventId) === eventId);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!event) {
-    return <div>Event not found</div>;
+  useEffect(() => {
+    if (!eventId) {
+      setError('Event not found');
+      setIsLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    fetchEvent(eventId, controller.signal)
+      .then((event) => {
+        setEvent(event);
+        setError(null);
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') {
+          console.error('Error fetching event:', error);
+          setError('Event not found');
+        }
+      })
+      .finally(() => setIsLoading(false));
+
+    return () => controller.abort();
+  }, [eventId]);
+
+  if (isLoading) {
+    return <div>Loading event...</div>;
+  }
+
+  if (error || !event) {
+    return <div>{error ?? 'Event not found'}</div>;
   }
 
 

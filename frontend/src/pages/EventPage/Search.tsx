@@ -1,22 +1,11 @@
 //Search
 
 import { useEffect, useState } from 'react';
-// import mockData from './mockData';
 import GridCard from './EventGridCard';
+import { fetchEvents, type Event } from './eventApi';
 
-interface Event {
-  eventId: string;
-  title: string;
-  category: string;
-  eventType: string;
-  address: string;
-  geoLocation: { lat: number; lng: number };
-  startDateTime: string;
-  endDateTime: string;
-  capacity: number;
-  ticketType: string;
-  booking: { available: number };
-  priceTicket: number;
+function normalizeText(value: string) {
+  return value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 }
 
 export function Search({ search, setSearch }: { search: string; setSearch: (value: string) => void }) {
@@ -47,10 +36,16 @@ export default function SearchPage() {
 
   // Fetch data from the backend when the component mounts
   useEffect(() => {
-    fetch('http://localhost:8080/api/events')
-      .then((res) => res.json())
-      .then((data) => setData(data))
+    const controller = new AbortController();
+
+    fetchEvents(controller.signal)
+      .then((events) => {
+        setData(events);
+        console.log('Data fetched successfully');
+      })
       .catch((err) => console.error('Error fetching events:', err));
+
+    return () => controller.abort();
   }, []);
 
   console.log('Fetched events:', data);
@@ -62,9 +57,9 @@ export default function SearchPage() {
         {...{
           items: search
             ? data.filter((item) =>
-              item.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").includes(search.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "")) ||
-              item.category.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").includes(search.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "")) ||
-              item.address.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").includes(search.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ""))
+              normalizeText(item.title).includes(normalizeText(search)) ||
+              normalizeText(item.category).includes(normalizeText(search)) ||
+              normalizeText(item.address).includes(normalizeText(search))
             )
             : data,
         }}
