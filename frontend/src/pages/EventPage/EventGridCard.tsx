@@ -1,20 +1,6 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
-
-interface Event {
-  eventId: string;
-  title: string;
-  category: string;
-  eventType: string;
-  address: string;
-  geoLocation: { lat: number; lng: number };
-  startDateTime: string;
-  endDateTime: string;
-  capacity: number;
-  ticketType: string;
-  booking: { available: number };
-  priceTicket: number;
-}
+import type { Event } from './eventApi';
 
 interface GridCardProps {
   event: Event;

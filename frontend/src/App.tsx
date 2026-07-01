@@ -9,6 +9,8 @@ import EventPage from './pages/EventPage/EventPage.tsx';
 import EventDetailsPage from './pages/EventDetailsPage/EventDetails.tsx';
 import BookingPage from './pages/BookingPage/bookingPage.tsx';
 import Messaging from './pages/Messaging/Messaging.tsx';
+import UsersPage from './pages/UsersPage/UsersPage.tsx';
+import UserDetailsPage from './pages/UserDetailsPage/UserDetailsPage.tsx';
 
 
 function App() {
@@ -16,7 +18,6 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Welcome />} />
-
         <Route element={<PrivateRoute />}>
           <Route path="/home" element={<Home />} />
         </Route>
@@ -26,6 +27,8 @@ function App() {
         <Route path="/register" element={<Registration />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/chat" element={<Messaging />} />
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="/users/:userId" element={<UserDetailsPage />} />
       </Routes>
     </BrowserRouter>
   );

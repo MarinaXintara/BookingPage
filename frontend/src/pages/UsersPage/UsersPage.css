@@ -1,0 +1,141 @@
+.users-page {
+  min-height: 100vh;
+  padding: 48px clamp(20px, 5vw, 72px);
+  background: #f6f7f9;
+  color: #17202a;
+  -webkit-font-smoothing: antialiased;
+}
+
+.users-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1120px;
+  margin: 0 auto 28px;
+}
+
+.users-eyebrow {
+  margin: 0 0 6px;
+  color: #667085;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.users-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.users-count {
+  display: grid;
+  place-items: center;
+  min-width: 52px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.08),
+    0 8px 24px rgba(16, 24, 40, 0.08);
+  color: #344054;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.users-state {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 28px;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.07),
+    0 14px 34px rgba(16, 24, 40, 0.08);
+  color: #475467;
+}
+
+.users-state-error {
+  color: #b42318;
+}
+
+.users-table-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.07),
+    0 14px 34px rgba(16, 24, 40, 0.08);
+}
+
+.users-table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.users-table th,
+.users-table td {
+  padding: 15px 18px;
+  border-bottom: 1px solid #eaecf0;
+  color: #344054;
+  font-size: 0.92rem;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.users-table thead th {
+  background: #f9fafb;
+  color: #667085;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.users-table tbody th {
+  color: #17202a;
+  font-weight: 800;
+}
+
+.users-table tbody tr:last-child th,
+.users-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.users-table tbody tr {
+  transition-property: background-color;
+  transition-duration: 140ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.users-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.users-table a {
+  color: #175cd3;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.users-table a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .users-page {
+    padding-top: 32px;
+  }
+
+  .users-header {
+    align-items: start;
+  }
+}

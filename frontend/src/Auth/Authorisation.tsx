@@ -32,3 +32,16 @@ function requireRole(allowedRoles: Role[]) {
   };
 }
 export { requireRole };
+
+export const pagePermissions: Record<string, Role[]> = {
+  "/home":            ["admin", "organiser", "user",],
+  "/welcome":         ["admin","organiser","user","guest"],
+  "/login":           ["admin","organiser","user","guest"],
+  "/register":        ["admin","organiser","user","guest"],
+  "/admin":           ["admin"],
+  "/chat":            ["admin","organiser"],
+  "/events":          ["admin","organiser","user","guest"],
+  "/events/:eventId": ["admin","organiser","user","guest"],
+  "/events/create":   ["admin", "organiser"],
+  "/profile":         ["admin", "organiser", "user"],
+};

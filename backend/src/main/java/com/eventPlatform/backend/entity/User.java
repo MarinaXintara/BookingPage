@@ -17,22 +17,22 @@ public class User {
     private String password;
     private String phoneNumber;
     private String address;
-    private String TIN;
-    private String  Role; //make this enum
+    private String tin;
+    private String role; //make this enum
 
     // Constructors
     public User() {}
 
     public User(String firstName, String lastName, String email, String password,
-                String phoneNumber, String address, String TIN) {
+                String phoneNumber, String address, String tin) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.TIN = TIN;
-        this.Role = "USER";
+        this.tin = tin;
+        this.role = "USER";
     }
 
     // Getters & Setters
@@ -89,19 +89,19 @@ public class User {
         this.address = address;
     }
 
-    public String getTIN() {
-        return TIN;
+    public String getTin() {
+        return tin;
     }
 
-    public void setTIN(String TIN) {
-        this.TIN = TIN;
+    public void setTin(String tin) {
+        this.tin = tin;
     }
 
     public String getRole() {
-        return Role;
+        return role;
     }
 
-    public void setRole(String Role) {
-        this.Role = Role;
+    public void setRole(String role) {
+        this.role = role;
     }
 }

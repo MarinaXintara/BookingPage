@@ -11,7 +11,7 @@ interface FormData {
     checkPassword: string;
     phoneNumber?: string;
     address?: string;
-    TIN?: string;
+    tin?: string;
 }
 
 const Register: React.FC = () => {
@@ -33,7 +33,7 @@ const Register: React.FC = () => {
             checkPassword: data.checkPassword,
             phoneNumber: data.phoneNumber,
             address: data.address,
-            TIN: data.TIN,
+            tin: data.tin,
         };
         console.log("Registering user: ", userData)
         fetch("http://localhost:8080/api/auth/register", {
@@ -103,7 +103,7 @@ const Register: React.FC = () => {
 
                 <input
                     type="text"
-                    {...register("TIN")}
+                    {...register("tin")}
                     placeholder="TIN"
                 />
 

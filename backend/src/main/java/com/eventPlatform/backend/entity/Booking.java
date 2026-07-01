@@ -1,6 +1,7 @@
 package com.eventPlatform.backend.entity;
 
 import com.eventPlatform.backend.enums.BookingStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -32,6 +33,7 @@ public class Booking {
 
     @ManyToOne
     @JoinColumn(name = "event_id")
+    @JsonBackReference
     private Event event;
 
     public Booking() {}
