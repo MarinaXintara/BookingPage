@@ -1,47 +1,23 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchEvent, type Event } from "../EventPage/eventApi";
+import { useFetchEvent } from "../../components/helper";
 import './EventDetails.css';
 
 
 
 export default function EventDetailsPage() {
   const { eventId } = useParams<{ eventId: string }>();
-  const [event, setEvent] = useState<Event | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!eventId) {
-      setError('Event not found');
-      setIsLoading(false);
-      return;
-    }
-
-    const controller = new AbortController();
-
-    fetchEvent(eventId, controller.signal)
-      .then((event) => {
-        setEvent(event);
-        setError(null);
-      })
-      .catch((error) => {
-        if (error.name !== 'AbortError') {
-          console.error('Error fetching event:', error);
-          setError('Event not found');
-        }
-      })
-      .finally(() => setIsLoading(false));
-
-    return () => controller.abort();
-  }, [eventId]);
+  const { event, error, isLoading } = useFetchEvent(eventId);
 
   if (isLoading) {
-    return <div>Loading event...</div>;
+    return <div>Loading...</div>;
   }
 
-  if (error || !event) {
-    return <div>{error ?? 'Event not found'}</div>;
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!event) {
+    return <div>Event not found</div>;
   }
 
 
@@ -54,15 +30,14 @@ export default function EventDetailsPage() {
         <p><strong>Type:</strong> {event.eventType}</p>
         <p><strong>Address:</strong> {event.address}</p>
         <p><strong>Date & Time:</strong> {new Date(event.startDateTime).toLocaleString()} - {new Date(event.endDateTime).toLocaleString()}</p>
-        <p><strong>Tickets Available:</strong> {event.booking.available}</p>
-        <p><strong>Ticket Price:</strong> €{event.priceTicket}</p>
       </div>
+
       <div className="event-buttons">
         <button onClick={() => window.location.href = "/events"}>
           Back to Events
         </button>
 
-        <button onClick={() => window.location.href = "/booking"}>
+        <button onClick={() => window.location.href = "/booking/" + event.eventId}>
           Book Tickets
         </button>
       </div>

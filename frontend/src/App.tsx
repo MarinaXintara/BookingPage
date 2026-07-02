@@ -1,34 +1,37 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { PrivateRoute } from './components/PrivateRoute.tsx';
 
-import Welcome from './pages/WelcomePage/Welcome.tsx';
-import Login from "./pages/LoginPage/Login.tsx";
-import Registration from "./pages/SignUpPage/SignUpForm.tsx";
-import { Home } from './pages/HomePage/Home.tsx';
-import EventPage from './pages/EventPage/EventPage.tsx';
+import Layout from './Layout.tsx';
+import BookingPage from './pages/BookingPage/BookingPage.tsx';
 import EventDetailsPage from './pages/EventDetailsPage/EventDetails.tsx';
-import BookingPage from './pages/BookingPage/bookingPage.tsx';
+import EventPage from './pages/EventPage/EventPage.tsx';
+import { Home } from './pages/HomePage/Home.tsx';
+import Login from "./pages/LoginPage/Login.tsx";
 import Messaging from './pages/Messaging/Messaging.tsx';
-import UsersPage from './pages/UsersPage/UsersPage.tsx';
+import Registration from "./pages/SignUpPage/SignUpForm.tsx";
 import UserDetailsPage from './pages/UserDetailsPage/UserDetailsPage.tsx';
-
+import UsersPage from './pages/UsersPage/UsersPage.tsx';
+import Welcome from './pages/WelcomePage/Welcome.tsx';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Welcome />} />
-        <Route element={<PrivateRoute />}>
-          <Route path="/home" element={<Home />} />
-        </Route>
-        <Route path="/events" element={<EventPage />} />
-        <Route path="/events/:eventId" element={<EventDetailsPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />
-        <Route path="/booking" element={<BookingPage />} />
-        <Route path="/chat" element={<Messaging />} />
-        <Route path="/users" element={<UsersPage />} />
-        <Route path="/users/:userId" element={<UserDetailsPage />} />
+        <Route element={<Layout />}>
+
+          <Route path="/" element={<Welcome />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="/home" element={<Home />} />
+          </Route>
+          <Route path="/events" element={<EventPage />} />
+          <Route path="/events/:eventId" element={<EventDetailsPage />} />
+          <Route path="/booking/:eventId" element={<BookingPage />} />
+          <Route path="/chat" element={<Messaging />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/users/:userId" element={<UserDetailsPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

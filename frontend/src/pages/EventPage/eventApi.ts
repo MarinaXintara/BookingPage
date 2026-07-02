@@ -8,12 +8,11 @@ export interface Event {
   startDateTime: string;
   endDateTime: string;
   capacity: number;
-  ticketType: string;
-  booking: { available: number };
-  priceTicket: number;
+  ticketTypes: TicketType[];
 }
 
-interface BackendTicketType {
+interface TicketType {
+  id: number;
   name: string;
   price: number;
   available: number;
@@ -30,13 +29,12 @@ interface BackendEvent {
   startDateTime: string;
   endDateTime: string;
   capacity: number;
-  ticketTypes?: BackendTicketType[];
+  ticketTypes?: TicketType[];
 }
 
 const API_URL = 'http://localhost:8080/api/events';
 
 function toEvent(event: BackendEvent): Event {
-  const firstTicketType = event.ticketTypes?.[0];
 
   return {
     eventId: String(event.id),
@@ -51,11 +49,7 @@ function toEvent(event: BackendEvent): Event {
     startDateTime: event.startDateTime,
     endDateTime: event.endDateTime,
     capacity: event.capacity,
-    ticketType: firstTicketType?.name ?? 'General Admission',
-    booking: {
-      available: firstTicketType?.available ?? event.capacity,
-    },
-    priceTicket: firstTicketType?.price ?? 0,
+    ticketTypes: event.ticketTypes ?? [],
   };
 }
 

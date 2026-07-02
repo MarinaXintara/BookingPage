@@ -37,7 +37,6 @@ const GridCard: React.FC<GridCardProps> = ({ event }) => {
           <p style={{ fontSize: '0.875rem', color: '#666' }}>
             {new Date(event.startDateTime).toLocaleString()}
           </p>
-          <p>Price: €{event.priceTicket}</p>
         </div>
       </div>
     </div >
