@@ -8,6 +8,14 @@ function normalizeText(value: string) {
   return value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 }
 
+// Athens Avenue ==> [Athens Tech Summit, Kifissias Avenue]
+function searchFullText(searchText: string, itemsToSearch: string[]): boolean {
+  
+  const normalizedSearchText=normalizeText(searchText);
+  const normalizedItemsToSearch=(itemsToSearch.map(item=>normalizeText(item)));
+  return normalizedSearchText.split(" ").every(searchSubtext => normalizedItemsToSearch.some(item =>item.includes(searchSubtext)));
+}
+
 export function Search({ search, setSearch }: { search: string; setSearch: (value: string) => void }) {
   return (
     <input
@@ -56,10 +64,7 @@ export default function SearchPage() {
       <EventGrid
         {...{
           items: search
-            ? data.filter((item) =>
-              normalizeText(item.title).includes(normalizeText(search)) ||
-              normalizeText(item.category).includes(normalizeText(search)) ||
-              normalizeText(item.address).includes(normalizeText(search))
+            ? data.filter((item) => searchFullText(search, [item.title, item.category, item.address])
             )
             : data,
         }}
