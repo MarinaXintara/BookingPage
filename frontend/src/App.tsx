@@ -22,9 +22,9 @@ function App() {
         <Route element={<Layout />}>
 
           <Route path="/" element={<Welcome />} />
-          <Route element={<PrivateRoute />}>
-            <Route path="/home" element={<Home />} />
-          </Route>
+          {/* <Route element={<PrivateRoute />}> */}
+          <Route path="/home" element={<Home />} />
+          {/* </Route> */}
           <Route path="/events" element={<EventPage />} />
           <Route path="/events/:eventId" element={<EventDetailsPage />} />
           <Route path="/booking/:eventId" element={<BookingPage />} />
