@@ -7,7 +7,7 @@ export default function NavBar() {
     const location = useLocation().pathname;
 
     const isActive = (pathName: string) => {
-        if (pathName === location) {
+        if (location.startsWith(pathName)) {
             return "active";
         }
         else {
