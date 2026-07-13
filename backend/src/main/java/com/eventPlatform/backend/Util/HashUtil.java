@@ -1,25 +1,15 @@
 package com.eventPlatform.backend.Util;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class HashUtil {
+    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public static String sha256(String input) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(input.getBytes());
-            StringBuilder hexString = new StringBuilder();
-
-            for (byte b : hash) {
-                hexString.append(String.format("%02x", b));
-            }
-
-            return hexString.toString();
-
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 algorithm not found", e);
-        }
+    public static String hashPassword(String password) {
+        return encoder.encode(password);
     }
 
+    public static boolean verifyPassword(String rawPassword, String hashedPassword) {
+        return encoder.matches(rawPassword, hashedPassword);
+    }
 }
