@@ -4,34 +4,34 @@
 
 ## Backend
 
-1. **Βαλε Spring Security**
+1. **Βαλε Spring Security** done
 
    Προσθεσε `spring-boot-starter-security`. Απο εδω και περα το backend, οχι το frontend, αποφασιζει ποιος εχει προσβαση.
 
-2. **Φτιαξε σωστο login με email/password**
+2. **Φτιαξε σωστο login με email/password** done
 
    Το login πρεπει να ψαχνει χρηστη με `email`, οχι με `id`. Αν το password ειναι σωστο, να δημιουργει session ή token.
 
-3. **Χρησιμοποιησε BCrypt για passwords**
+3. **Χρησιμοποιησε BCrypt για passwords** done
 
    Μην χρησιμοποιεις SHA-256. Τα passwords πρεπει να αποθηκευονται με `BCryptPasswordEncoder`.
 
-4. **Μην επιστρεφεις ποτε password απο API**
+4. **Μην επιστρεφεις ποτε password απο API** done
 
    Μην επιστρεφεις απευθειας το `User` entity. Φτιαξε DTO, π.χ. `UserResponse`, χωρις `password`.
 
-5. **Διαλεξε auth τροπο**
+5. **Διαλεξε auth τροπο** done
 
    Η πιο καθαρη λυση για αυτο το app:
 
-   - backend session cookie
+   - backend session cookie <-- this was done
    - `HttpOnly`
    - `Secure` σε production
    - `SameSite=Lax` ή `Strict`
 
    Ετσι το token δεν το βλεπει ποτε η JavaScript.
 
-6. **Φτιαξε endpoint `/api/auth/me`**
+6. **Φτιαξε endpoint `/api/auth/me`** done
 
    Το frontend θα το καλει για να μαθει:
 
@@ -39,7 +39,7 @@
    - ποιο ειναι το `id`
    - ποιο ειναι το `role`
 
-7. **Φτιαξε logout**
+7. **Φτιαξε logout** done
 
    Το logout πρεπει να ακυρωνει το backend session/cookie, οχι απλως να καθαριζει localStorage.
 
