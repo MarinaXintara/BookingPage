@@ -62,7 +62,7 @@ public class UserController {
         if(user.getPassword() != null) {
             temp.setPassword(user.getPassword());
         }
-        if(user.getFirstName() != null) {
+        if(user.getPhoneNumber() != null) {
             temp.setPhoneNumber(user.getPhoneNumber());
         }
         if(user.getAddress() != null) {
@@ -75,6 +75,6 @@ public class UserController {
             temp.setRole(user.getRole());
         }
         return userService.saveUser(temp);
-
     }
+
 }
