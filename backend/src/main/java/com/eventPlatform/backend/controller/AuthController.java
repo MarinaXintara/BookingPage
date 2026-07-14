@@ -1,46 +1,74 @@
 package com.eventPlatform.backend.controller;
-
-
-import com.eventPlatform.backend.Util.HashUtil;
+import com.eventPlatform.backend.DTO.UserResponse;
 import com.eventPlatform.backend.entity.User;
 import com.eventPlatform.backend.service.UserService;
-import org.apache.tomcat.util.http.parser.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, PasswordEncoder passwordEncoder){
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @PostMapping("login")
-    public String loginUser(@RequestBody User user) {
-        User temp =  userService.findById(user.getId());
-        if(temp == null) {
-            throw new RuntimeException("failed");
+
+    @PostMapping("/login")
+    public String loginUser(@RequestBody User user, HttpSession session) {
+
+        User existingUser = userService.findByEmail(user.getEmail());
+
+        if(existingUser == null) {
+            throw new RuntimeException("Invalid credentials");
         }
-        if(temp.getEmail().equals(user.getEmail())) {
-            if (HashUtil.sha256(temp.getPassword()).equals(user.getPassword())) {
-                return "success";
-            }
+
+        if(!passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
         }
-        throw new RuntimeException("failed");
+        session.setAttribute("userId", existingUser.getId());
+
+        return "success";
     }
 
-    @PostMapping("register")
+
+    @PostMapping("/register")
     public String registerUser(@RequestBody User user) {
-        try{
-            userService.saveUser(user);
-            return "success";
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        userService.saveUser(user);
+
+        return "success";
+    }
+
+
+    @GetMapping("/me")
+    public UserResponse me(HttpSession session){
+
+        Long userId = (Long) session.getAttribute("userId");
+
+        if(userId == null){
+            throw new RuntimeException("Not logged in");
         }
-        catch(Exception e){
-            throw new RuntimeException(e);
+        User user = userService.findById(userId);
+
+        if(user == null){
+            throw new RuntimeException("User not found");
         }
+        return new UserResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole());
+    }
+
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+
+        session.invalidate();
+
+        return "Logged out successfully";
     }
 }
