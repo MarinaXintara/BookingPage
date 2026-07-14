@@ -70,7 +70,7 @@ public class User {
     }
 
     public void setPassword(String password) {
-        this.password = HashUtil.sha256(password);
+        this.password = password;
     }
 
     public String getPhoneNumber() {
