@@ -12,6 +12,9 @@ import Registration from "./pages/SignUpPage/SignUpForm.tsx";
 import UserDetailsPage from './pages/UserDetailsPage/UserDetailsPage.tsx';
 import UsersPage from './pages/UsersPage/UsersPage.tsx';
 import Welcome from './pages/WelcomePage/Welcome.tsx';
+import CreateEvent from './pages/OrganiseEvent/CreateEvent.tsx';
+import EditEvent from './pages/OrganiseEvent/EditEvent.tsx';
+import DeleteButton from './pages/OrganiseEvent/DeleteEvent.tsx'; 
 
 function App() {
   return (
@@ -31,6 +34,9 @@ function App() {
           <Route path="/chat" element={<Messaging />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/users/:userId" element={<UserDetailsPage />} />
+          <Route path="/create-event" element={<CreateEvent />} />
+          <Route path="/edit-event/:eventId" element={<EditEvent eventId={''} />} />
+          <Route path="/delete-event/:eventId" element={<DeleteButton eventId={''} />} />
         </Route>
       </Routes>
     </BrowserRouter>
