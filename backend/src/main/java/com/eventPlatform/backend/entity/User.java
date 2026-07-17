@@ -18,7 +18,7 @@ public class User {
     private String phoneNumber;
     private String address;
     private String tin;
-    private String role; //make this enum
+    private String role= "USER";// //make this enum
 
     // Constructors
     public User() {}
