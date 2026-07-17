@@ -14,6 +14,7 @@ public class UserResponse {
     public UserResponse() {}
 
     public UserResponse(Long id,String firstName, String lastName, String email,String role) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
