@@ -12,9 +12,10 @@ import Registration from "./pages/SignUpPage/SignUpForm.tsx";
 import UserDetailsPage from './pages/UserDetailsPage/UserDetailsPage.tsx';
 import UsersPage from './pages/UsersPage/UsersPage.tsx';
 import Welcome from './pages/WelcomePage/Welcome.tsx';
-import CreateEvent from './pages/OrganiseEvent/CreateEvent.tsx';
-import EditEvent from './pages/OrganiseEvent/EditEvent.tsx';
-import DeleteButton from './pages/OrganiseEvent/DeleteEvent.tsx'; 
+import CreateEvent from './pages/OrganiseEvent/CreateEvent/CreateEvent.tsx';
+import EditEvent from './pages/OrganiseEvent/EditEvent/EditEvent.tsx';
+import DeleteButton from './pages/OrganiseEvent/DeleteEvent/DeleteEvent.tsx'; 
+import EventMap from './OpenStreetMap/loadMap.tsx'; 
 
 function App() {
   return (
