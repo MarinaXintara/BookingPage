@@ -17,6 +17,27 @@ const Booking: React.FC = () => {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  const selectedType = event?.ticketTypes.find(
+    (type) => type.id === selectedTicketTypeId
+  );
+
+  if (!selectedType) {
+    setMessage({
+      type: "error",
+      text: "Ticket type not found."
+    });
+    return;
+  }
+
+
+  if (numberOfTickets > selectedType.available) {
+    setMessage({
+      type: "error",
+      text: "Not enough available tickets."
+    });
+    return;
+  }
+
 
   const handleBook = async () => {
     setMessage(null);
@@ -42,9 +63,13 @@ const Booking: React.FC = () => {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error("Failed to book.");
+      if (!response.ok) {
+        throw new Error("Failed to create booking.");
+      }
 
-      setMessage({ type: "success", text: "Booking completed!" });
+      const booking = await response.json();
+
+      setMessage({ type: "success", text: `Your booking is ${booking.bookingStatus.toLowerCase()}!` });
       setSelectedTicketTypeId(null);
       setNumberOfTickets(0);
 

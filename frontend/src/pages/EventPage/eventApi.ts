@@ -4,18 +4,40 @@ export interface Event {
   category: string;
   eventType: string;
   address: string;
-  geoLocation: { lat: number; lng: number };
+  geoLocation: { latitude: number; longitude: number };
   startDateTime: string;
   endDateTime: string;
   capacity: number;
   ticketTypes: TicketType[];
+  bookings?: Booking[];
+  organiserUserId?: number;
+  status?: string;
+  description?: string;
+  media?: Media[];
+
 }
 
 interface TicketType {
   id: number;
   name: string;
   price: number;
+  quantity: number;
   available: number;
+}
+
+interface Booking{
+  id: number;
+  attendeeUserId: number;
+  time: string;
+  ticketTypeRef: number;
+  numberOfTickets: number;
+  totalCost: number;
+  bookingStatus: string;
+
+}
+
+interface Media{
+  photoUrl: string;
 }
 
 interface BackendEvent {
@@ -43,8 +65,8 @@ function toEvent(event: BackendEvent): Event {
     eventType: event.eventType,
     address: event.address,
     geoLocation: {
-      lat: event.latitude ?? 0,
-      lng: event.longitude ?? 0,
+      latitude: event.latitude ?? 0,
+      longitude: event.longitude ?? 0,
     },
     startDateTime: event.startDateTime,
     endDateTime: event.endDateTime,

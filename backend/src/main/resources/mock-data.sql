@@ -87,12 +87,12 @@ VALUES
     (6, 'Remote Seat', 25.00, 120, 120, 3);
 
 INSERT INTO bookings
-    (id, time, number_of_tickets, total_cost, booking_status, attendee_id, ticket_type_id, event_id)
+    (id,attendee_id, time,ticket_type_ref, number_of_tickets, total_cost, booking_status, ticket_type_id)
 VALUES
-    (1, '2026-06-27 12:00:00', 2, 98.00, 'CONFIRMED', 3, 1, 1),
-    (2, '2026-06-27 12:15:00', 1, 19.00, 'PENDING', 4, 2, 1),
-    (3, '2026-06-27 12:30:00', 2, 70.00, 'CONFIRMED', 3, 4, 2),
-    (4, '2026-06-27 12:45:00', 1, 55.00, 'CANCELLED', 4, 5, 2);
+    (1, 3, '2026-06-27 12:00:00',T1, 2, 98.00, 'CONFIRMED', 1),
+    (2, 4, '2026-06-27 12:15:00', T2,1, 19.00, 'PENDING', 2),
+    (3, 3, '2026-06-27 12:30:00',T3, 2, 70.00, 'CONFIRMED', 4),
+    (4, 4, '2026-06-27 12:45:00', T4,1, 55.00, 'CANCELLED', 5,);
 
 SELECT setval(pg_get_serial_sequence('users', 'id'), COALESCE((SELECT MAX(id) FROM users), 1), true);
 SELECT setval(pg_get_serial_sequence('events', 'id'), COALESCE((SELECT MAX(id) FROM events), 1), true);
