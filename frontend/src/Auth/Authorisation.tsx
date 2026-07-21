@@ -35,13 +35,13 @@ export { requireRole };
 
 export const pagePermissions: Record<string, Role[]> = {
   "/home":            ["admin", "organiser", "user",],
-  "/welcome":         ["admin","organiser","user","guest"],
-  "/login":           ["admin","organiser","user","guest"],
-  "/register":        ["admin","organiser","user","guest"],
+  "/welcome":         ["admin","organiser","user"],
+  "/login":           ["admin","organiser","user"],
+  "/register":        ["admin","organiser","user"],
   "/admin":           ["admin"],
   "/chat":            ["admin","organiser"],
-  "/events":          ["admin","organiser","user","guest"],
-  "/events/:eventId": ["admin","organiser","user","guest"],
-  "/events/create":   ["admin", "organiser"],
+  "/events":          ["admin","organiser","user"],
+  "/events/:eventId": ["admin","organiser","user"],
+  "/events/create-event":   ["admin", "organiser"],
   "/profile":         ["admin", "organiser", "user"],
 };
