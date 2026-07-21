@@ -28,7 +28,15 @@ export async function fetchUsers(): Promise<User[]> {
 }
 
 export async function fetchUser(userId: string): Promise<User> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/showUsers/${userId}`);
+  const response = await fetch(`${API_BASE_URL}/api/auth/showUsers/${userId}`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+  
+
 
   if (!response.ok) {
     throw new Error("Failed to fetch user");

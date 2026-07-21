@@ -20,6 +20,7 @@ const Login: React.FC = () => {
         fetch("http://localhost:8080/api/auth/login", {
             method: "POST",
             body: JSON.stringify(data),
+            credentials: "include",
             headers: {"Content-Type": "application/json"}})
             .then(response => {
                 console.log(response);
