@@ -34,7 +34,7 @@ function requireRole(allowedRoles: Role[]) {
 export { requireRole };
 
 export const pagePermissions: Record<string, Role[]> = {
-  "/home":            ["admin", "organiser", "user",],
+  "/home":            ["admin", "organiser", "user"],
   "/welcome":         ["admin","organiser","user"],
   "/login":           ["admin","organiser","user"],
   "/register":        ["admin","organiser","user"],

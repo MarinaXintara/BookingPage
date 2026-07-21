@@ -16,7 +16,7 @@ import CreateEvent from './pages/OrganiseEvent/CreateEvent/CreateEvent.tsx';
 import EditEvent from './pages/OrganiseEvent/EditEvent/EditEvent.tsx';
 import DeleteButton from './pages/OrganiseEvent/DeleteEvent/DeleteEvent.tsx'; 
 import EventMap from './OpenStreetMap/loadMap.tsx'; 
-
+import Auth  from './test/test.tsx';
 function App() {
   return (
     <BrowserRouter>
@@ -33,11 +33,12 @@ function App() {
           <Route path="/events/:eventId" element={<EventDetailsPage />} />
           <Route path="/booking/:eventId" element={<BookingPage />} />
           <Route path="/chat" element={<Messaging />} />
-          <Route path="/users" element={<UsersPage />} />
+          <Route path="/auth/showUsers" element={<UsersPage />} />
           <Route path="/users/:userId" element={<UserDetailsPage />} />
           <Route path="/create-event" element={<CreateEvent />} />
           <Route path="/edit-event/:eventId" element={<EditEvent eventId={''} />} />
           <Route path="/delete-event/:eventId" element={<DeleteButton eventId={''} />} />
+          <Route path="/test" element={<Auth/>} />
         </Route>
       </Routes>
     </BrowserRouter>
