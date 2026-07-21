@@ -87,7 +87,7 @@ public class AuthController {
         }
 
         String userRole = user.getRole();
-        if(!"Admin".equals(userRole) ){
+        if(!"ADMIN".equals(userRole) ){
             throw new RuntimeException("Not Admin");
         }
         List<User> allUsers = userService.getAllUsers();
