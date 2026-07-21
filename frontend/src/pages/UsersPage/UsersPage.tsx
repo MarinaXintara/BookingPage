@@ -73,7 +73,7 @@ export default function UsersPage() {
               {users.map((user) => (
                 <tr key={user.id}>
                   <th scope="row">
-                    <Link to={`/users/${user.id}`}>
+                    <Link to={`/users`}>
                       {user.firstName} {user.lastName}
                     </Link>
                   </th>
