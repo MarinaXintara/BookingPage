@@ -2,6 +2,8 @@ import { useParams } from "react-router-dom";
 import { useFetchEvent } from "../../components/helper";
 import './EventDetails.css';
 import EventMap from "../../OpenStreetMap/loadMap";
+import DeleteButton from "../OrganiseEvent/DeleteEvent/DeleteEvent";
+import EditEvent from "../OrganiseEvent/EditEvent/EditEvent";
 
 
 
@@ -61,8 +63,14 @@ export default function EventDetailsPage() {
           <button onClick={() => window.location.href = "/booking/" + event.eventId}>
             Book Tickets
           </button>
+
+          <DeleteButton eventId={event.eventId} />
+          <button onClick={() => window.location.href = "/edit-event/" + event.eventId}>
+            Edit Event
+          </button>
         </div>
       </div>
     </div>
+
   );
 }
