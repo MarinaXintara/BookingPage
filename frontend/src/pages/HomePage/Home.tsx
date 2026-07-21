@@ -5,7 +5,7 @@ export function Home() {
             method: 'POST',
             credentials: 'include', // This is important to include cookies
         });
-        window.location.href = "/login";
+        window.location.href = "/";
     }
 
     return (
