@@ -16,6 +16,9 @@ export function Home() {
             >
                 Logout
             </button>
+            <button
+                onClick={() => window.location.href = "/test"}
+            >test</button>
         </div>
     )
 }
