@@ -74,7 +74,7 @@ public class AuthController {
         return "Logged out successfully";
     }
 
-    @PostMapping("/showUsers")
+    @GetMapping("/showUsers")
     public List<User> ShowUsers(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
 
@@ -87,7 +87,7 @@ public class AuthController {
         }
 
         String userRole = user.getRole();
-        if(userRole != "ADMIN" ){
+        if(!"Admin".equals(userRole) ){
             throw new RuntimeException("Not Admin");
         }
         List<User> allUsers = userService.getAllUsers();
