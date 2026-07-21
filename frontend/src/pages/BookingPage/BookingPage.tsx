@@ -17,38 +17,34 @@ const Booking: React.FC = () => {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const selectedType = event?.ticketTypes.find(
-    (type) => type.id === selectedTicketTypeId
-  );
-
-  if (!selectedType) {
-    setMessage({
-      type: "error",
-      text: "Ticket type not found."
-    });
-    return;
-  }
-
-
-  if (numberOfTickets > selectedType.available) {
-    setMessage({
-      type: "error",
-      text: "Not enough available tickets."
-    });
-    return;
-  }
-
 
   const handleBook = async () => {
     setMessage(null);
 
     // Validation checks
-    if (!selectedTicketTypeId) {
+    if (selectedTicketTypeId === null) {
       setMessage({ type: "error", text: "Please select a ticket type." });
       return;
     }
     if (numberOfTickets <= 0) {
       setMessage({ type: "error", text: "Please select the number of tickets." });
+      return;
+    }
+
+    const selectedType = event?.ticketTypes.find(
+      type => type.id === selectedTicketTypeId
+    );
+
+    if (!selectedType) {
+      setMessage({ type: "error", text: "Selected ticket type is invalid." });
+      return;
+    }
+
+    if (numberOfTickets > selectedType.available) {
+      setMessage({
+        type: "error",
+        text: "Not enough available tickets."
+      });
       return;
     }
 

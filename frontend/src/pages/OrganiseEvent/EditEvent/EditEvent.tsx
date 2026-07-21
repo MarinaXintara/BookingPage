@@ -63,7 +63,7 @@ export default function EditEvent({ eventId }: { eventId: string }) {
 
   return (
     <div>
-      <h2>Edit Event</h2>
+     
       
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px', gap: '10px' }}>
         
