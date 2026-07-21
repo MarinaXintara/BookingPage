@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -71,4 +73,26 @@ public class AuthController {
 
         return "Logged out successfully";
     }
+
+    @PostMapping("/showUsers")
+    public List<User> ShowUsers(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if(userId == null){
+            throw new RuntimeException("Not logged in");
+        }
+        User user = userService.findById(userId);
+        if(user == null){
+            throw new RuntimeException("User not found");
+        }
+
+        String userRole = user.getRole();
+        if(userRole != "ADMIN" ){
+            throw new RuntimeException("Not Admin");
+        }
+        List<User> allUsers = userService.getAllUsers();
+        return allUsers;
+
+    }
+
 }
