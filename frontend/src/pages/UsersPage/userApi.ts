@@ -12,7 +12,7 @@ export interface User {
 const API_BASE_URL = "http://localhost:8080";
 
 export async function fetchUsers(): Promise<User[]> {
-  const response = await fetch(`${API_BASE_URL}/api/users`);
+  const response = await fetch(`${API_BASE_URL}/api/auth/showUsers`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch users");
