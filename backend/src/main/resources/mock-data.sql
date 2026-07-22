@@ -13,7 +13,7 @@ TRUNCATE TABLE bookings, ticket_types, events, users RESTART IDENTITY CASCADE;
 INSERT INTO users
     (id, first_name, last_name, email, password, phone_number, address, tin, role)
 VALUES
-    (1, 'Admin', 'User', 'admin@example.com', 'password123', '+30 210 000 0001', '1 Admin Street, Athens', '100000001', 'ADMIN'),
+    (1, 'Admin', 'User', 'admin@example.com', '$2a$10$NLWScgZiOq4CsLIHVD12BuIhapphzJKHL8UCWQHjpgZZHPxVuHG5q', '+30 210 000 0001', '1 Admin Street, Athens', '100000001', 'ADMIN'),
     (2, 'Olivia', 'Papadopoulos', 'organizer@example.com', 'password123', '+30 210 000 0002', '25 Event Avenue, Athens', '100000002', 'ORGANIZER'),
     (3, 'Nikos', 'Georgiou', 'nikos@example.com', 'password123', '+30 210 000 0003', '9 Ermou Street, Athens', '100000003', 'USER'),
     (4, 'Maria', 'Ioannou', 'maria@example.com', 'password123', '+30 210 000 0004', '14 Tsimiski Street, Thessaloniki', '100000004', 'USER');
