@@ -28,7 +28,7 @@ export async function fetchUsers(): Promise<User[]> {
 }
 
 export async function fetchUser(userId: string): Promise<User> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/showUsers/${userId}`, {
+  const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
     method: "GET",
     credentials: "include",
     headers: {
