@@ -35,9 +35,7 @@ export async function fetchUser(userId: string): Promise<User> {
       "Content-Type": "application/json"
     }
   });
-  
-
-
+  console.log(response.status);
   if (!response.ok) {
     throw new Error("Failed to fetch user");
   }
