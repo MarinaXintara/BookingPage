@@ -9,7 +9,6 @@ export interface Event {
   endDateTime: string;
   capacity: number;
   ticketTypes: TicketType[];
-  bookings?: Booking[];
   organiserUserId?: number;
   status?: string;
   description?: string;
@@ -25,16 +24,7 @@ interface TicketType {
   available: number;
 }
 
-interface Booking{
-  id: number;
-  attendeeUserId: number;
-  time: string;
-  ticketTypeRef: number;
-  numberOfTickets: number;
-  totalCost: number;
-  bookingStatus: string;
 
-}
 
 interface Media{
   photoUrl: string;
