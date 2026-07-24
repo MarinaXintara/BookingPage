@@ -25,6 +25,8 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable Long id) {
+        System.out.println("GET USER CALLED WITH ID: " + id);
+
         User user = userService.findById(id);
 
         if(user == null) {
