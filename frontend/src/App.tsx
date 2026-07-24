@@ -15,8 +15,8 @@ import Welcome from './pages/WelcomePage/Welcome.tsx';
 import CreateEvent from './pages/OrganiseEvent/CreateEvent/CreateEvent.tsx';
 import EditEvent from './pages/OrganiseEvent/EditEvent/EditEvent.tsx';
 import DeleteButton from './pages/OrganiseEvent/DeleteEvent/DeleteEvent.tsx'; 
-import EventMap from './OpenStreetMap/loadMap.tsx'; 
-import Auth  from './test/test.tsx';
+import GetBookings from './pages/myBookings/myBookings.tsx';
+
 function App() {
   return (
     <BrowserRouter>
@@ -38,7 +38,7 @@ function App() {
           <Route path="/create-event" element={<CreateEvent />} />
           <Route path="/edit-event/:eventId" element={<EditEvent eventId={''} />} />
           <Route path="/delete-event/:eventId" element={<DeleteButton eventId={''} />} />
-          <Route path="/test" element={<Auth/>} />
+          <Route path="/myBookings" element={<GetBookings />} />
         </Route>
       </Routes>
     </BrowserRouter>
