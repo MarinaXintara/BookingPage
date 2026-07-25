@@ -1,8 +1,17 @@
 package com.eventPlatform.backend.service;
 
+import com.eventPlatform.backend.DTO.BookingRequest;
 import com.eventPlatform.backend.entity.Booking;
+import com.eventPlatform.backend.entity.Event;
+import com.eventPlatform.backend.entity.TicketType;
+import com.eventPlatform.backend.entity.User;
 import com.eventPlatform.backend.repository.BookingRepository;
+import com.eventPlatform.backend.repository.EventRepository;
+import com.eventPlatform.backend.repository.TicketTypeRepository;
+import com.eventPlatform.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import com.eventPlatform.backend.enums.BookingStatus;
+import java.time.LocalDateTime;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,9 +19,15 @@ import java.util.Optional;
 @Service
 public class BookingService {
     private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
+    private final TicketTypeRepository ticketTypeRepository;
 
-    public BookingService(BookingRepository bookingRepository) {
+    public BookingService(BookingRepository bookingRepository, UserRepository userRepository, EventRepository eventRepository, TicketTypeRepository ticketTypeRepository) {
         this.bookingRepository = bookingRepository;
+        this.userRepository = userRepository;
+        this.eventRepository = eventRepository;
+        this.ticketTypeRepository = ticketTypeRepository;
     }
 
     public List<Booking> getAllBookings() {
@@ -23,12 +38,43 @@ public class BookingService {
         return bookingRepository.findById(id);
     }
 
+    public List<Booking> getBookingsByUser(Long userId) {
+        return bookingRepository.findByAttendeeId(userId);
+    }
+
     public Booking saveBooking(Booking booking) {
         return bookingRepository.save(booking);
     }
 
     public void deleteBooking(Long id) {
         bookingRepository.deleteById(id);
+    }
+
+    public Booking createBooking(BookingRequest request, Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow();
+
+        Event event = eventRepository.findById(request.getEventId())
+                .orElseThrow();
+
+        TicketType ticketType = ticketTypeRepository.findById(request.getTicketTypeId())
+                .orElseThrow();
+
+        Booking booking = new Booking();
+
+        booking.setAttendee(user);
+        booking.setEvent(event);
+        booking.setTicketType(ticketType);
+        booking.setNumberOfTickets(request.getNumberOfTickets());
+        booking.setTime(LocalDateTime.now());
+
+        double cost = ticketType.getPrice() * request.getNumberOfTickets();
+        booking.setTotalCost(cost);
+
+        booking.setBookingStatus(BookingStatus.PENDING);
+
+        return bookingRepository.save(booking);
     }
 
     public Booking findById(Long id) {
