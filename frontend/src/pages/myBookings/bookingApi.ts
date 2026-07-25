@@ -10,7 +10,7 @@ export interface Booking{
 }
 
 export async function fetchBookings(): Promise<Booking[]> {
-  const response = await fetch(`http://localhost:8080/api/Booking`, {
+  const response = await fetch(`http://localhost:8080/api/Booking/myBookings`, {
     method: "GET",
     credentials: "include",
     headers: {

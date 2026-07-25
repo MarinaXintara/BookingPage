@@ -53,13 +53,14 @@ const Booking: React.FC = () => {
     try {
       setIsSubmitting(true);
 
-      const response = await fetch("http://localhost:8080/api/bookings", {
+      const response = await fetch("http://localhost:8080/api/Booking/createBooking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
+        if (!response.ok) {
         throw new Error("Failed to create booking.");
       }
 
@@ -128,7 +129,7 @@ const Booking: React.FC = () => {
           </p>
 
           <div className="booking-buttons">
-            <button onClick={() => window.location.href = "/events/" + event.eventId}>
+            <button onClick={() => window.location.href = `/events/${eventId}`}>
               Back to Events
             </button>
 
