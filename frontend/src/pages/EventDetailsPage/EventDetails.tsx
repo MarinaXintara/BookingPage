@@ -3,7 +3,7 @@ import { useFetchEvent } from "../../components/helper";
 import './EventDetails.css';
 import EventMap from "../../OpenStreetMap/loadMap";
 import DeleteButton from "../OrganiseEvent/DeleteEvent/DeleteEvent";
-import EditEvent from "../OrganiseEvent/EditEvent/EditEvent";
+
 
 
 
