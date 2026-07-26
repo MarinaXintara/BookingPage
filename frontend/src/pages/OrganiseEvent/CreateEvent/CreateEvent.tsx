@@ -47,7 +47,9 @@ export default function CreateEvent() {
 
         setMessage("Submitting...");
 
-        const formData = new FormData(event.currentTarget);
+        const form = event.currentTarget;
+
+        const formData = new FormData(form);
 
         const capacity = Number(formData.get("capacity"));
 
@@ -85,6 +87,7 @@ export default function CreateEvent() {
                 "http://localhost:8080/api/events/createEvent",
                 {
                     method: "POST",
+                    credentials:"include",
                     headers: {
                         "Content-Type": "application/json",
                     },
@@ -99,7 +102,7 @@ export default function CreateEvent() {
 
                 setMessage("Event created successfully!");
 
-                event.currentTarget.reset();
+               form.reset();
 
                 setTicketTypes([
                     {
@@ -220,8 +223,9 @@ export default function CreateEvent() {
                     placeholder="Image URL"
                 />
 
-                <button type="submit">
-                    Publish
+                <button type="submit"
+                    onClick={()=>(window.location.href="/events")}>
+                        Publish
                 </button>
             </form>
 
