@@ -16,6 +16,7 @@ import CreateEvent from './pages/OrganiseEvent/CreateEvent/CreateEvent.tsx';
 import EditEvent from './pages/OrganiseEvent/EditEvent/EditEvent.tsx';
 import DeleteButton from './pages/OrganiseEvent/DeleteEvent/DeleteEvent.tsx'; 
 import GetBookings from './pages/myBookings/myBookings.tsx';
+import Profil from './pages/userProfil/userProfil.tsx';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="/edit-event/:eventId" element={<EditEvent eventId={''} />} />
           <Route path="/delete-event/:eventId" element={<DeleteButton eventId={''} />} />
           <Route path="/myBookings" element={<GetBookings />} />
+          <Route path="/userProfil/:userId" element={<Profil userId={''}/>}/>
         </Route>
       </Routes>
     </BrowserRouter>
