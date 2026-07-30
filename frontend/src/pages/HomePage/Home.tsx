@@ -1,24 +1,33 @@
-export function Home() {
+import { useState } from "react";
+import { useAuth } from "../../Auth/useAuth.ts";
 
-    const logout = async () => {
-        await fetch('http://localhost:8080/api/logout', {
-            method: 'POST',
-            credentials: 'include', // This is important to include cookies
-        });
-        window.location.href = "/";
+export function Home() {
+    const { user, logout } = useAuth();
+    const [error, setError] = useState<string | null>(null);
+
+    const handleLogout = async () => {
+        setError(null);
+
+        try {
+            await logout();
+        } catch {
+            setError("Could not log out. Please try again.");
+        }
     }
 
     return (
         <div>
-            <h1>Welcome to the Home Page!</h1>
+            <h1>Welcome, {user?.firstName}!</h1>
+            <p>Signed in as {user?.email} ({user?.role})</p>
             <button
-                onClick={logout}
+                onClick={handleLogout}
             >
                 Logout
             </button>
             <button
                 onClick={() => window.location.href = "/test"}
             >test</button>
+            {error && <p role="alert">{error}</p>}
         </div>
     )
 }

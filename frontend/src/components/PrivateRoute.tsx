@@ -1,12 +1,15 @@
-// PrivateRoute.tsx
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '../Auth/useAuth.ts';
 
-export const PrivateRoute: React.FC = () => {
-    const userIsSignedIn = localStorage.getItem('isLoggedIn') === 'true';
+export function PrivateRoute() {
+    const { user, loading } = useAuth();
     const location = useLocation();
 
-    // If logged in, render child routes; otherwise redirect to /login
-    return userIsSignedIn ? (
+    if (loading) {
+        return <p aria-live="polite">Checking session...</p>;
+    }
+
+    return user ? (
         <Outlet />
     ) : (
         <Navigate
@@ -15,4 +18,4 @@ export const PrivateRoute: React.FC = () => {
             state={{ from: location }} // remember original page
         />
     );
-};
+}

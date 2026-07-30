@@ -1,5 +1,7 @@
 import React from "react";
 import {useForm} from "react-hook-form";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../Auth/useAuth.ts";
 import "../../App.css";
 import "./Login.css";
 
@@ -9,6 +11,14 @@ interface LoginData {
 }
 
 const Login: React.FC = () => {
+    const { user, loading, login } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const redirectPath =
+        (location.state as { from?: { pathname?: string } } | null)
+            ?.from?.pathname ?? "/home";
+    const [submitError, setSubmitError] = React.useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
     const {
         register,
         handleSubmit,
@@ -16,19 +26,25 @@ const Login: React.FC = () => {
     } = useForm<LoginData>();
 
 
-    const onSubmit = (data: LoginData) => {
-        fetch("http://localhost:8080/api/auth/login", {
-            method: "POST",
-            body: JSON.stringify(data),
-            credentials: "include",
-            headers: {"Content-Type": "application/json"}})
-            .then(response => {
-                console.log(response);
-            if (response.ok) {
-                window.location.assign('/home')
-            }
-        })
-        .catch(error => console.log(error));
+    React.useEffect(() => {
+        if (!loading && user) {
+            navigate(redirectPath, { replace: true });
+        }
+    }, [loading, navigate, redirectPath, user]);
+
+    const onSubmit = async (data: LoginData) => {
+        setIsSubmitting(true);
+        setSubmitError(null);
+
+        try {
+            await login(data);
+        } catch (error) {
+            setSubmitError(
+                error instanceof Error ? error.message : "Could not log in"
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
     }
     
 
@@ -48,7 +64,14 @@ const Login: React.FC = () => {
                     placeholder="Password"
                 />
                 {errors.password && <span className="error">{errors.password?.message}</span>}
-                <button type="submit">Login</button>
+                {submitError && <span className="error" role="alert">{submitError}</span>}
+                <button type="submit" disabled={loading || isSubmitting}>
+                    {loading
+                        ? "Checking session..."
+                        : isSubmitting
+                          ? "Logging in..."
+                          : "Login"}
+                </button>
             </form>
         </>
     );

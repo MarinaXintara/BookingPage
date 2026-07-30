@@ -1,21 +1,13 @@
-// auth/authentication.ts
+export type Role = "ADMIN" | "ORGANIZER" | "USER";
 
-export type Role = "admin" | "organiser" | "user" | "guest";
-
-export interface User {
-  id: string;
+export interface CurrentUser {
+  id: number;
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
-  phoneNumber: string;
-  address: string;
-  tin: string;
   role: Role;
-  isActive: boolean;
 }
 
 export interface WithCurrentUser {
-  currentUser: User | null | undefined;
+  currentUser: CurrentUser | null | undefined;
 }
-
