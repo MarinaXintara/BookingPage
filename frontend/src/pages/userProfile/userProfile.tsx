@@ -1,7 +1,7 @@
 import { fetchUser, type User } from "../UsersPage/userApi"
 import { useEffect, useState } from "react";
 
-export default function Profil({ userId }: { userId: string }) {
+export default function Profile({ userId }: { userId: string }) {
     const [user, setUser] = useState<User | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -18,6 +18,7 @@ export default function Profil({ userId }: { userId: string }) {
         };
         loadUserDetails();
     }, [userId])
+
     if (error) {
         return <p>{error}</p>;
     }
