@@ -1,42 +1,48 @@
-export interface Booking{
+export type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED";
+
+export interface Booking {
   id: number;
-  attendeeUserId: number;
   time: string;
-  ticketTypeRef: number;
   numberOfTickets: number;
   totalCost: number;
-  bookingStatus: string;
-
+  bookingStatus: BookingStatus;
+  ticketType: {
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+    available: number;
+  };
 }
 
-export async function fetchBookings(): Promise<Booking[]> {
-  const response = await fetch(`http://localhost:8080/api/Booking/myBookings`, {
+export async function fetchBookings(signal?: AbortSignal): Promise<Booking[]> {
+  const response = await fetch("http://localhost:8080/api/Booking/myBookings", {
     method: "GET",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json"
-    }
+    signal,
   });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch bookings");
+    throw new Error(
+      response.status === 401
+        ? "Please log in to view your bookings."
+        : "Could not load your bookings."
+    );
   }
 
   return response.json();
 }
 
-export async function fetchBooking(Id: string): Promise<Booking> {
-  const response = await fetch(`http://localhost:8080/api/Booking/${Id}`, {
+export async function fetchBooking(id: string, signal?: AbortSignal): Promise<Booking> {
+  const response = await fetch(`http://localhost:8080/api/Booking/${id}`, {
     method: "GET",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json"
-    }
+    signal,
   });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch booking");
+    throw new Error("Could not load the booking.");
   }
 
   return response.json();
-} 
+}
