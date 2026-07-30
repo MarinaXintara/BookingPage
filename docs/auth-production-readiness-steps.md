@@ -94,7 +94,7 @@
 
 15. **Βγαλε plaintext mock passwords**
 
-    Το `mock-data.sql` να εχει hashed passwords ή να ειναι καθαρα dev-only.
+    Το `data.sql` να έχει hashed passwords και να χρησιμοποιείται μόνο για development/demo δεδομένα.
 
 ## Frontend
 

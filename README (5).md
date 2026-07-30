@@ -107,7 +107,7 @@ BookingPage is an event booking platform where visitors can browse events, parti
 │       │   │   └── CorsConfig.java
 │       │   └── resources/
 │       │       ├── application.properties
-│       │       └── mock-data.sql
+│       │       └── data.sql
 │       └── test/
 ├── frontend/
 │   ├── package.json
@@ -127,6 +127,8 @@ BookingPage is an event booking platform where visitors can browse events, parti
 │   ├── requirementsBreakdown.md
 │   ├── rolesAndFlows.md
 │   └── servicesLogic.md
+├── scripts/
+│   └── reset-data.sql
 └── auth-production-readiness-steps.md
 ```
 
@@ -143,10 +145,13 @@ Install these before running the app locally:
 The backend currently expects a local PostgreSQL database using the values in `backend/src/main/resources/application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/my-postgres
+spring.datasource.url=jdbc:postgresql://localhost:5433/my-postgres
 spring.datasource.username=postgres
 spring.datasource.password=postgres
 ```
+
+If PostgreSQL is running on a different port, update
+`spring.datasource.url` and use the same port in the commands below.
 
 ## Quick Start for Ubuntu / WSL
 
@@ -207,7 +212,7 @@ database: my-postgres
 username: postgres
 password: postgres
 host: localhost
-port: 5432
+port: 5433
 ```
 
 ### 3. Backend
@@ -238,18 +243,18 @@ Expected response:
 Backend works!
 ```
 
-After the backend has started once and Hibernate has created the tables, load the mock data:
+Hibernate creates or updates the tables, and Spring Boot then loads the
+development records from `backend/src/main/resources/data.sql`. No separate
+seed command is required.
 
-```bash
-cd /path/to/BookingPage-main
-PGPASSWORD=postgres psql -h localhost -U postgres -d my-postgres -f backend/src/main/resources/mock-data.sql
-```
+The demo accounts all use the password `password123`:
 
-If the repo is under the Windows filesystem in WSL, the path may look like:
-
-```bash
-cd /mnt/e/Software/BookingPage-main/BookingPage-main
-```
+| Role | Email |
+| --- | --- |
+| Admin | `admin@example.com` |
+| Organizer | `organizer@example.com` |
+| Participant | `nikos@example.com` |
+| Participant | `maria@example.com` |
 
 ### 4. Frontend
 
@@ -336,22 +341,49 @@ spring.jpa.hibernate.ddl-auto=update
 
 That means tables are created/updated automatically from the JPA entities during local development.
 
-### 5. Load mock data
+### 5. Development data
 
-After the backend has started at least once, load:
+The backend automatically loads:
 
 ```text
-backend/src/main/resources/mock-data.sql
+backend/src/main/resources/data.sql
 ```
 
-Example on Windows PowerShell:
+The script adds demo users, events, ticket types, and bookings. Its inserts use
+fixed primary keys with `ON CONFLICT DO NOTHING`, so restarting the backend
+does not duplicate or overwrite existing records.
+
+All demo accounts use the password:
+
+```text
+password123
+```
+
+### 6. Reset development data
+
+Resetting is manual and destructive. Run the reset only against the local
+`my-postgres` development database.
+
+If the database was previously loaded from the old `mock-data.sql`, run this
+reset once so the old rows are replaced with the corrected relationships and
+BCrypt password hashes.
+
+From WSL:
+
+```bash
+PGPASSWORD=postgres psql -h localhost -p 5433 -U postgres -d my-postgres -f scripts/reset-data.sql
+```
+
+From Windows PowerShell:
 
 ```powershell
 $env:PGPASSWORD='postgres'
-& 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -h localhost -U postgres -d my-postgres -f backend\src\main\resources\mock-data.sql
+& 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -h localhost -p 5433 -U postgres -d my-postgres -f scripts\reset-data.sql
 ```
 
-Adjust the PostgreSQL path if your installed version is different.
+Adjust the PostgreSQL executable path or port if necessary. After the reset,
+restart the backend; Spring Boot will load `data.sql` again with fresh
+relative event dates.
 
 ## Running the App
 
@@ -638,7 +670,8 @@ Can:
 - Frontend runs on port `5173`.
 - CORS is configured for `http://localhost:5173`.
 - The app currently uses local development database credentials.
-- `mock-data.sql` resets and seeds users, events, ticket types, and bookings.
+- `data.sql` automatically adds demo users, events, ticket types, and bookings.
+- `scripts/reset-data.sql` clears development data only when run manually.
 
 ## Security / Production Notes
 
@@ -664,7 +697,7 @@ High-priority items:
 - Enforce ownership checks for user/event resources.
 - Remove `localStorage.isLoggedIn` as an auth source.
 - Move production CORS origins and secrets to environment configuration.
-- Do not use plaintext seeded passwords in production data.
+- Do not load the seeded demo accounts in a production database.
 
 Frontend route guards are useful for user experience, but they are not security. All real access control must be enforced by the backend.
 
@@ -685,6 +718,15 @@ Run backend tests:
 cd backend
 .\mvnw.cmd test
 ```
+
+Reset local development data:
+
+```powershell
+$env:PGPASSWORD='postgres'
+& 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -h localhost -p 5433 -U postgres -d my-postgres -f scripts\reset-data.sql
+```
+
+Restart the backend after resetting so it reloads `data.sql`.
 
 ### Frontend
 
