@@ -1,27 +1,29 @@
-import { useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import UserIconComponent from "../UserIcon/UserIconComponent.tsx";
 import "./NavBar.css";
 
-
 export default function NavBar() {
+  const linkClassName = ({ isActive }: { isActive: boolean }) =>
+    isActive ? "active" : "";
 
-    const location = useLocation().pathname;
+  return (
+    <nav className="topnav" aria-label="Main navigation">
+      <div className="nav-links">
+        <NavLink className={linkClassName} to="/home">
+          Home
+        </NavLink>
+        <NavLink className={linkClassName} to="/events">
+          Events
+        </NavLink>
+        <NavLink className={linkClassName} to="/chat">
+          Chat
+        </NavLink>
+        <NavLink className={linkClassName} to="/users">
+          Users
+        </NavLink>
+      </div>
 
-    const isActive = (pathName: string) => {
-        if (location.startsWith(pathName)) {
-            return "active";
-        }
-        else {
-            return ""
-        }
-    }
-
-    return (
-        <div className="topnav">
-            <a className={isActive("/home")} href="/home">Home</a>
-            <a className={isActive("/events")} href="/events">Events</a>
-            <a className={isActive("/chat")} href="/chat">Chat</a>
-            <a className={isActive("/users")} href="/users">Users</a>
-        </div>
-    )
-
-};
+      <UserIconComponent />
+    </nav>
+  );
+}
