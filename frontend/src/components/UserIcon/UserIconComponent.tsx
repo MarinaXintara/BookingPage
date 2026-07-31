@@ -55,9 +55,10 @@ export default function UserIconComponent() {
 
       {isOpen && (
         <div className="user-dropdown" id="user-dropdown">
-          <strong>
+          <Link to="/profile" onClick={() => setIsOpen(false)}><strong>
             {user.firstName} {user.lastName}
           </strong>
+          </Link>
           <span className="user-email">{user.email}</span>
           <span className="user-role">{user.role}</span>
 

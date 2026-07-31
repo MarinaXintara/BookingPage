@@ -65,7 +65,7 @@ export default function EventDetailsPage() {
           </button>
 
           <DeleteButton eventId={event.eventId} />
-          <button onClick={() => window.location.href = "/edit-event/" + event.eventId}>
+          <button onClick={() => window.location.href = "/editEvent/" + event.eventId}>
             Edit Event
           </button>
         </div>

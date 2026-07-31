@@ -15,8 +15,8 @@ export default function NavBar() {
         <NavLink className={linkClassName} to="/events">
           Events
         </NavLink>
-        <NavLink className={linkClassName} to="/chat">
-          Chat
+        <NavLink className={linkClassName} to="/messaging">
+          Messaging
         </NavLink>
         <NavLink className={linkClassName} to="/users">
           Users

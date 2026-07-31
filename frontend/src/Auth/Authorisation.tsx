@@ -35,9 +35,9 @@ export const pagePermissions: Record<string, Role[]> = {
   "/login":           ["ADMIN", "ORGANIZER", "USER"],
   "/register":        ["ADMIN", "ORGANIZER", "USER"],
   "/admin":           ["ADMIN"],
-  "/chat":            ["ADMIN", "ORGANIZER"],
+  "/messaging":       ["ADMIN", "ORGANIZER", "USER"],
   "/events":          ["ADMIN", "ORGANIZER", "USER"],
   "/events/:eventId": ["ADMIN", "ORGANIZER", "USER"],
-  "/events/create-event":   ["ADMIN", "ORGANIZER"],
+  "/events/createEvent":   ["ADMIN", "ORGANIZER"],
   "/profile":         ["ADMIN", "ORGANIZER", "USER"],
 };

@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { PrivateRoute } from './components/PrivateRoute.tsx';
 import { AuthProvider } from './Auth/AuthProvider.tsx';
+import { PrivateRoute } from './components/PrivateRoute.tsx';
 
 import Layout from './Layout.tsx';
 import BookingPage from './pages/BookingPage/BookingPage.tsx';
@@ -9,15 +9,15 @@ import EventPage from './pages/EventPage/EventPage.tsx';
 import { Home } from './pages/HomePage/Home.tsx';
 import Login from "./pages/LoginPage/Login.tsx";
 import Messaging from './pages/Messaging/Messaging.tsx';
-import Registration from "./pages/SignUpPage/SignUpForm.tsx";
+import CreateEvent from './pages/OrganiseEvent/CreateEvent/CreateEvent.tsx';
+import DeleteButton from './pages/OrganiseEvent/DeleteEvent/DeleteEvent.tsx';
+import EditEvent from './pages/OrganiseEvent/EditEvent/EditEvent.tsx';
+import Registration from "./pages/registerPage/registerPage.tsx";
 import UserDetailsPage from './pages/UserDetailsPage/UserDetailsPage.tsx';
 import UsersPage from './pages/UsersPage/UsersPage.tsx';
 import Welcome from './pages/WelcomePage/Welcome.tsx';
-import CreateEvent from './pages/OrganiseEvent/CreateEvent/CreateEvent.tsx';
-import EditEvent from './pages/OrganiseEvent/EditEvent/EditEvent.tsx';
-import DeleteButton from './pages/OrganiseEvent/DeleteEvent/DeleteEvent.tsx'; 
 import GetBookings from './pages/myBookings/myBookings.tsx';
-import Profile from './pages/userProfile/userProfile.tsx';
+import Profile from './pages/profile/Profile.tsx';
 
 function App() {
   return (
@@ -34,14 +34,14 @@ function App() {
             <Route element={<PrivateRoute />}>
               <Route path="/home" element={<Home />} />
               <Route path="/booking/:eventId" element={<BookingPage />} />
-              <Route path="/chat" element={<Messaging />} />
+              <Route path="/messaging" element={<Messaging />} />
               <Route path="/users" element={<UsersPage />} />
               <Route path="/users/:userId" element={<UserDetailsPage />} />
-              <Route path="/create-event" element={<CreateEvent />} />
-              <Route path="/edit-event/:eventId" element={<EditEvent eventId={''} />} />
-              <Route path="/delete-event/:eventId" element={<DeleteButton eventId={''} />} />
+              <Route path="/createEvent" element={<CreateEvent />} />
+              <Route path="/editEvent/:eventId" element={<EditEvent eventId={''} />} />
+              <Route path="/deleteEvent/:eventId" element={<DeleteButton eventId={''} />} />
               <Route path="/myBookings" element={<GetBookings />} />
-              <Route path="/userProfil/:userId" element={<Profile userId={''}/>}/>
+              <Route path="/profile" element={<Profile />} />
             </Route>
           </Route>
         </Routes>

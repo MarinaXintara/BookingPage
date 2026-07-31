@@ -24,15 +24,6 @@
   color: #657086;
 }
 
-.my-bookings__eyebrow {
-  margin: 0;
-  color: #3659a7;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
 .my-bookings__count {
   flex: 0 0 auto;
   padding: 0.6rem 0.9rem;

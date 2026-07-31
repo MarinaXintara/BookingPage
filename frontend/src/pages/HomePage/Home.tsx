@@ -24,9 +24,7 @@ export function Home() {
             >
                 Logout
             </button>
-            <button
-                onClick={() => window.location.href = "/test"}
-            >test</button>
+            
             {error && <p role="alert">{error}</p>}
         </div>
     )
