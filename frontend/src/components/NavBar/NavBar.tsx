@@ -1,8 +1,10 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../Auth/useAuth.ts";
 import UserIconComponent from "../UserIcon/UserIconComponent.tsx";
 import "./NavBar.css";
 
 export default function NavBar() {
+  const { user } = useAuth();
   const linkClassName = ({ isActive }: { isActive: boolean }) =>
     isActive ? "active" : "";
 
@@ -15,9 +17,11 @@ export default function NavBar() {
         <NavLink className={linkClassName} to="/events">
           Events
         </NavLink>
-        <NavLink className={linkClassName} to="/messaging">
-          Messaging
-        </NavLink>
+        {user?.role === "USER" || user?.role === "ORGANIZER" ? (
+          <NavLink className={linkClassName} to="/messaging">
+            Messaging
+          </NavLink>
+        ) : null}
         <NavLink className={linkClassName} to="/users">
           Users
         </NavLink>

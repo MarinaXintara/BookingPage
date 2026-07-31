@@ -38,8 +38,8 @@ function App() {
               <Route path="/users" element={<UsersPage />} />
               <Route path="/users/:userId" element={<UserDetailsPage />} />
               <Route path="/createEvent" element={<CreateEvent />} />
-              <Route path="/editEvent/:eventId" element={<EditEvent eventId={''} />} />
-              <Route path="/deleteEvent/:eventId" element={<DeleteButton eventId={''} />} />
+              <Route path="/editEvent/:eventId" element={<EditEvent />} />
+              <Route path="/deleteEvent/:eventId" element={<DeleteButton />} />
               <Route path="/myBookings" element={<GetBookings />} />
               <Route path="/profile" element={<Profile />} />
             </Route>

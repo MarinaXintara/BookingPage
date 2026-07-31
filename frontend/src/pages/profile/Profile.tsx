@@ -66,12 +66,15 @@ export default function Profile() {
       description: "Find new events and reserve your next tickets.",
       to: "/events",
     },
-    {
+  ];
+
+  if (user.role !== "ADMIN") {
+    actions.push({
       title: "Messages",
       description: "Open your conversations with other members.",
       to: "/messaging",
-    },
-  ];
+    });
+  }
 
   if (user.role === "ORGANIZER" || user.role === "ADMIN") {
     actions.push({

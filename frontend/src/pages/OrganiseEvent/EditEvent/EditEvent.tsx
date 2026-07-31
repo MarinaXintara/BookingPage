@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 
-export default function EditEvent({ eventId }: { eventId: string }) {
+export default function EditEvent() {
+  const { eventId } = useParams();
+
   const [message, setMessage] = useState('');
 
 
@@ -33,7 +36,7 @@ export default function EditEvent({ eventId }: { eventId: string }) {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    
+
 
     const data = {
       id: Number(eventId),
@@ -76,29 +79,29 @@ export default function EditEvent({ eventId }: { eventId: string }) {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px', gap: '10px' }}>
 
         <label htmlFor="title">Title:</label>
-        <input type="text"value={eventData.title}onChange={(e) =>setEventData({...eventData,title: e.target.value,})}
+        <input type="text" value={eventData.title} onChange={(e) => setEventData({ ...eventData, title: e.target.value, })}
         />
-<input
-    type="text"
-    value={eventData.category}
-    onChange={(e) =>
-        setEventData({
-            ...eventData,
-            category: e.target.value,
-        })
-    }
-/>
-<input
-    type="number"
-    value={eventData.capacity}
-    min="1"
-    onChange={(e) =>
-        setEventData({
-            ...eventData,
-            capacity: (e.target.value),
-        })
-    }
-/>
+        <input
+          type="text"
+          value={eventData.category}
+          onChange={(e) =>
+            setEventData({
+              ...eventData,
+              category: e.target.value,
+            })
+          }
+        />
+        <input
+          type="number"
+          value={eventData.capacity}
+          min="1"
+          onChange={(e) =>
+            setEventData({
+              ...eventData,
+              capacity: (e.target.value),
+            })
+          }
+        />
 
         <button type="submit">Save Changes</button>
       </form>
