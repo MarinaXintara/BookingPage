@@ -1,7 +1,7 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import "../../App.css";  // Updated path assuming App.css is in src/
-import "./SignUpForm.css";  // Assuming this file exists in the same folder
+import "./registerPage.css";  // Assuming this file exists in the same folder
 
 interface FormData {
     firstName: string;
@@ -19,10 +19,10 @@ const Register: React.FC = () => {
         register,
         handleSubmit,
         formState: { errors },
-        watch,
+        control,
     } = useForm<FormData>();
 
-    const password = watch("password");
+    const password = useWatch({ control, name: "password" });
 
     const onSubmit = (data: FormData) => {
         const userData = {

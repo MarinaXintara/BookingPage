@@ -1,34 +1,58 @@
 import { useEffect, useState } from "react";
 import { fetchEvent, type Event } from "../pages/EventPage/eventApi";
 
+interface EventRequestState {
+    eventId?: string;
+    event: Event | null;
+    error: string | null;
+}
+
 export function useFetchEvent(eventId?: string) {
-    const [event, setEvent] = useState<Event | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [requestState, setRequestState] = useState<EventRequestState>({
+        eventId: undefined,
+        event: null,
+        error: null,
+    });
 
     useEffect(() => {
         if (!eventId) {
-            setError('Event not found');
-            setIsLoading(false);
             return;
         }
 
-        setIsLoading(true);
+        let cancelled = false;
+
         fetchEvent(eventId)
             .then((data: Event) => {
-                setEvent(data);
-                setError(null);
+                if (!cancelled) {
+                    setRequestState({ eventId, event: data, error: null });
+                }
             })
             .catch(() => {
-                setError('Failed to fetch event details');
-                setEvent(null);
-            })
-            .finally(() => {
-                setIsLoading(false);
+                if (!cancelled) {
+                    setRequestState({
+                        eventId,
+                        event: null,
+                        error: 'Failed to fetch event details',
+                    });
+                }
             });
 
+        return () => {
+            cancelled = true;
+        };
     }, [eventId]);
 
-    return { event, error, isLoading };
-}
+    if (!eventId) {
+        return { event: null, error: 'Event not found', isLoading: false };
+    }
 
+    if (requestState.eventId !== eventId) {
+        return { event: null, error: null, isLoading: true };
+    }
+
+    return {
+        event: requestState.event,
+        error: requestState.error,
+        isLoading: false,
+    };
+}

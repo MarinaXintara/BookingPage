@@ -137,7 +137,7 @@ BookingPage is an event booking platform where visitors can browse events, parti
 Install these before running the app locally:
 
 - Java 17
-- Node.js 20+ recommended
+- Node.js 20.19+ (Node 20; pinned by `.nvmrc`)
 - npm
 - PostgreSQL
 - Git
@@ -583,7 +583,7 @@ The current React app defines these routes:
 | `/login` | Login page |
 | `/register` | Registration page |
 | `/booking` | Booking page |
-| `/chat` | Messaging page |
+| `/messaging` | Messaging page |
 | `/users` | Users page |
 | `/users/:userId` | User details page |
 

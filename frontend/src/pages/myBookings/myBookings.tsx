@@ -222,7 +222,6 @@ export default function MyBookingsPage() {
     <main className="my-bookings">
       <header className="my-bookings__header">
         <div>
-          <p className="my-bookings__eyebrow">Your tickets</p>
           <h1>My Bookings</h1>
           <p>Review your upcoming events and booking history.</p>
         </div>

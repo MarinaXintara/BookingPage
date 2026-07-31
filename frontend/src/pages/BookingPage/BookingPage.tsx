@@ -70,8 +70,11 @@ const Booking: React.FC = () => {
       setSelectedTicketTypeId(null);
       setNumberOfTickets(0);
 
-    } catch (error: any) {
-      setMessage({ type: "error", text: error.message || "Something went wrong." });
+    } catch (error: unknown) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Something went wrong.",
+      });
     } finally {
       setIsSubmitting(false);
     }

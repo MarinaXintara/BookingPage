@@ -9,7 +9,7 @@ const Welcome: React.FC = () => {
         fetch("http://localhost:8080/api/test")
             .then((res) => res.text())
             .then((data) => setResponse(data))
-            .catch((_err) => setResponse("Error fetching data"));
+            .catch(() => setResponse("Error fetching data"));
     }, []);
 
     return (
