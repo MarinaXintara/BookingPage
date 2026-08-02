@@ -1,76 +1,71 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useAuth } from "../../Auth/useAuth";
 import { useFetchEvent } from "../../components/helper";
-import './EventDetails.css';
 import EventMap from "../../OpenStreetMap/loadMap";
-import DeleteButton from "../OrganiseEvent/DeleteEvent/DeleteEvent";
-
-
-
 
 export default function EventDetailsPage() {
   const { eventId } = useParams<{ eventId: string }>();
+  const { user } = useAuth();
   const { event, error, isLoading } = useFetchEvent(eventId);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  if (isLoading) return <main className="page"><p className="page-message">Loading event...</p></main>;
+  if (error) return <main className="page"><p className="page-message page-message--error">{error}</p></main>;
+  if (!event) return <main className="page"><p className="page-message">Event not found.</p></main>;
 
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  if (!event) {
-    return <div>Event not found</div>;
-  }
-
-  console.log(event.ticketTypes);
-  console.log(event.geoLocation);
+  const canManage = user?.role === "ORGANIZER" || user?.role === "ADMIN";
+  const eventType = [event.category, event.eventType].filter(Boolean).join(" · ");
+  const cityAndCountry = [event.city, event.country].filter(Boolean).join(", ");
+  const statusLabel = event.status && event.status !== "PUBLISHED"
+    ? event.status.toLowerCase()
+    : null;
 
   return (
-    <div className="event-details-container">
-      <h1>{event.title}</h1>
-
-      <div className="event-details-info">
-        <p><strong>Title:</strong> {event.title}</p>
-        <p><strong>Category:</strong> {event.category}</p>
-        <p><strong>Address:</strong> {event.address}</p>
-        <EventMap latitude={event.geoLocation.latitude} longitude={event.geoLocation.longitude} title={event.title} />
-        <p><strong>Date & Time:</strong> {new Date(event.startDateTime).toLocaleString()} - {new Date(event.endDateTime).toLocaleString()}</p>
-        <p><strong>Description:</strong> {event.description}</p>
-        <p><strong>Tickets:</strong></p>
-        {event.ticketTypes && event.ticketTypes.length > 0 ? (
-          event.ticketTypes.map((ticketType) => (
-            <div key={ticketType.id}>
-              <p>
-                <strong>Type:</strong> {ticketType.name}
-              </p>
-
-              <p>
-                <strong>Price:</strong>{" "}
-                {Number(ticketType.price).toFixed(2)}€
-              </p>
-            </div>
-          ))
-        ) : (
-          <p>No tickets available.</p>
-        )}
-
-        <div className="event-buttons">
-          <button onClick={() => window.location.href = "/events"}>
-            Back to Events
-          </button>
-
-          <button onClick={() => window.location.href = "/booking/" + event.eventId}>
-            Book Tickets
-          </button>
-
-          <DeleteButton eventId={event.eventId} />
-          <button onClick={() => window.location.href = "/editEvent/" + event.eventId}>
-            Edit Event
-          </button>
+    <main className="page page--narrow">
+      <header className="page-header">
+        <div>
+          <h1>{event.title}</h1>
+          {eventType ? <p>{eventType}</p> : null}
         </div>
-      </div>
-    </div>
+      </header>
 
+      <article className="panel event-details">
+        <dl className="details-list">
+          <div><dt>Organizer</dt><dd>{event.organizerName ?? "Not specified"}</dd></div>
+          {event.venue ? <div><dt>Venue</dt><dd>{event.venue}</dd></div> : null}
+          {event.address ? <div><dt>Address</dt><dd>{event.address}</dd></div> : null}
+          {cityAndCountry ? <div><dt>City and country</dt><dd>{cityAndCountry}</dd></div> : null}
+          <div><dt>Starts</dt><dd>{new Date(event.startDateTime).toLocaleString("en-GB")}</dd></div>
+          <div><dt>Ends</dt><dd>{new Date(event.endDateTime).toLocaleString("en-GB")}</dd></div>
+          {statusLabel ? <div><dt>Status</dt><dd className="event-status">{statusLabel}</dd></div> : null}
+        </dl>
+
+        {event.description ? <section><h2>About</h2><p>{event.description}</p></section> : null}
+
+        <section>
+          <h2>Tickets</h2>
+          {event.ticketTypes.length > 0 ? (
+            <ul className="ticket-list">
+              {event.ticketTypes.map((ticketType) => (
+                <li key={ticketType.id}>
+                  {ticketType.name}: {Number(ticketType.price).toFixed(2)} € ({ticketType.available} available)
+                </li>
+              ))}
+            </ul>
+          ) : <p>No tickets available.</p>}
+        </section>
+
+        {event.geoLocation ? (
+          <EventMap latitude={event.geoLocation.latitude} longitude={event.geoLocation.longitude} title={event.title} />
+        ) : null}
+
+        <div className="page-actions">
+          <Link className="button button--secondary" to="/events">Back to events</Link>
+          <Link className="button" to={`/booking/${event.eventId}`}>Book tickets</Link>
+          {canManage ? (
+            <Link className="button button--secondary" to={`/editEvent/${event.eventId}`}>Edit event</Link>
+          ) : null}
+        </div>
+      </article>
+    </main>
   );
 }

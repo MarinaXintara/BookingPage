@@ -1,30 +1,21 @@
-import React, { useEffect, useState } from "react";
-import "./Welcome.css";
+import { Link } from "react-router-dom";
 
-const Welcome: React.FC = () => {
-
-    const [response, setResponse] = useState("loading...");
-
-    useEffect(() => {
-        fetch("http://localhost:8080/api/test")
-            .then((res) => res.text())
-            .then((data) => setResponse(data))
-            .catch(() => setResponse("Error fetching data"));
-    }, []);
-
-    return (
-        <div className="welcome-page">
-            <h1>Welcome to BookIT</h1>
-            <p>You can search here your favourite event.</p>
-
-            <div className="welcome-actions">
-                <button onClick={() => window.location.href = "/events"}>Search Events</button>
-                <button onClick={() => window.location.href = "/register"}>Register</button>
-                <button onClick={()=>window.location.href= "/login"}>Login</button>
-            </div>
-            {response}
-        </div>
-    );
-};
-
-export default Welcome;
+export default function Welcome() {
+  return (
+    <main className="welcome-page">
+      <h1>Welcome to BookIT</h1>
+      <p>You can search here your favourite event.</p>
+      <div className="welcome-actions">
+        <Link className="button" to="/events">
+          Search events
+        </Link>
+        <Link className="button button--secondary" to="/register">
+          Register
+        </Link>
+        <Link className="button button--secondary" to="/login">
+          Login
+        </Link>
+      </div>
+    </main>
+  );
+}

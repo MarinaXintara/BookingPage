@@ -1,46 +1,22 @@
-import React from 'react';
-import { useNavigate } from "react-router-dom";
-import type { Event } from './eventApi';
+import { Link } from "react-router-dom";
+import type { Event } from "./eventApi";
 
-interface GridCardProps {
-  event: Event;
-}
+export default function EventGridCard({ event }: { event: Event }) {
+  const eventType = [event.category, event.eventType].filter(Boolean).join(" · ");
+  const location = [event.venue, event.city].filter(Boolean).join(" · ");
+  const statusLabel = event.status && event.status !== "PUBLISHED"
+    ? event.status.toLowerCase()
+    : null;
 
-
-const GridCard: React.FC<GridCardProps> = ({ event }) => {
-  const navigate = useNavigate();
-  const [isHovered, setIsHovered] = React.useState(false);
   return (
-    <div
-      onClick={() => navigate ("/events/" + event.eventId)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-
-      style={
-        isHovered ? { border: '1px solid #007BFF', borderRadius: '8px', overflow: 'hidden', maxWidth: '540px', marginBottom: '1rem', cursor: 'pointer' } :
-          {
-            border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden', maxWidth: '540px', marginBottom: '1rem'
-          }}>
-      <div style={{ display: 'flex' }}>
-        <div style={{ flex: 1, textAlign: 'center', padding: '1rem' }}>
-          <img
-            src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/20190710102234/download3.png"
-            style={isHovered ? { scale: 1.05, width: '100%', height: 'auto', borderRadius: '4px' } : { width: '100%', height: 'auto', borderRadius: '4px' }}
-            alt="Event"
-
-          />
-        </div>
-        <div style={{ flex: 1, padding: '1rem' }}>
-          <h5 style={isHovered ? { color: '#943444', fontSize: 14 } : {}}>{event.title}</h5>
-          <p>{event.category} - {event.eventType}</p>
-          <p>{event.address}</p>
-          <p style={{ fontSize: '0.875rem', color: '#666' }}>
-            {new Date(event.startDateTime).toLocaleString()}
-          </p>
-        </div>
-      </div>
-    </div >
+    <Link className="event-card" to={`/events/${event.eventId}`}>
+      <h2>{event.title}</h2>
+      {location ? <p>{location}</p> : null}
+      {eventType ? <p className="event-card__type">{eventType}</p> : null}
+      <time dateTime={event.startDateTime}>
+        {new Date(event.startDateTime).toLocaleString("en-GB")}
+      </time>
+      {statusLabel ? <span className="event-card__status">{statusLabel}</span> : null}
+    </Link>
   );
-};
-
-export default GridCard;
+}

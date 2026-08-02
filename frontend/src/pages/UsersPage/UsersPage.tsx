@@ -1,92 +1,50 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import "./UsersPage.css";
 import { fetchUsers, type User } from "./userApi";
 
 export default function UsersPage() {
-  const [users, setUsers] = React.useState<User[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  React.useEffect(() => {
+  useEffect(() => {
     let ignore = false;
+    fetchUsers()
+      .then((result) => {
+        if (!ignore) setUsers(result);
+      })
+      .catch(() => {
+        if (!ignore) setError("Could not load users.");
+      })
+      .finally(() => {
+        if (!ignore) setIsLoading(false);
+      });
 
-    async function loadUsers() {
-      try {
-        const result = await fetchUsers();
-
-        if (!ignore) {
-          setUsers(result);
-          setError(null);
-        }
-      } catch {
-        if (!ignore) {
-          setError("Could not load users.");
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadUsers();
-
-    return () => {
-      ignore = true;
-    };
+    return () => { ignore = true; };
   }, []);
 
   return (
-    <main className="users-page">
-      <section className="users-header">
-        <div>
-          <p className="users-eyebrow">Admin</p>
-          <h1>Users</h1>
-        </div>
-        <div className="users-count" aria-label={`${users.length} users`}>
-          {users.length}
-        </div>
-      </section>
-
-      {isLoading ? (
-        <section className="users-state" aria-live="polite">
-          Loading users...
-        </section>
-      ) : error ? (
-        <section className="users-state users-state-error" role="alert">
-          {error}
-        </section>
-      ) : users.length === 0 ? (
-        <section className="users-state">No users found.</section>
-      ) : (
-        <section className="users-table-wrap" aria-label="User table">
-          <table className="users-table">
-            <thead>
-              <tr>
-                <th scope="col">User</th>
-                <th scope="col">Email</th>
-                <th scope="col">Role</th>
-              </tr>
-            </thead>
+    <main className="page">
+      <header className="page-header"><div><h1>Users</h1><p>{users.length} registered users</p></div></header>
+      {isLoading ? <p className="page-message">Loading users...</p> : null}
+      {error ? <p className="page-message page-message--error" role="alert">{error}</p> : null}
+      {!isLoading && !error && users.length === 0 ? <p className="page-message">No users found.</p> : null}
+      {!isLoading && !error && users.length > 0 ? (
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead><tr><th scope="col">User</th><th scope="col">Email</th><th scope="col">Role</th></tr></thead>
             <tbody>
               {users.map((user) => (
                 <tr key={user.id}>
-                  <th scope="row">
-                    <Link to={`/users/${user.id}`}>
-                      {user.firstName} {user.lastName}
-                    </Link>
-                  </th>
-                  <td>
-                    <a href={`mailto:${user.email}`}>{user.email}</a>
-                  </td>
+                  <th scope="row"><Link to={`/users/${user.id}`}>{user.firstName} {user.lastName}</Link></th>
+                  <td><a href={`mailto:${user.email}`}>{user.email}</a></td>
                   <td>{user.role || "-"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </section>
-      )}
+        </div>
+      ) : null}
     </main>
   );
 }

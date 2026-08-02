@@ -1,149 +1,109 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, type FormEvent } from "react";
+import { Link, useParams } from "react-router-dom";
+import Button from "../../components/Button";
 import { useFetchEvent } from "../../components/helper";
-import './BookingPage.css';
 
-const Booking: React.FC = () => {
-
-  // Get the eventId from the URL parameters
+export default function Booking() {
   const { eventId } = useParams<{ eventId: string }>();
-
-  // Fetch the event item
-  const { event, error: eventError, isLoading: eventIsLoading } = useFetchEvent(eventId);
-
-  // State for selected ticket type and number of tickets
+  const { event, error: eventError, isLoading } = useFetchEvent(eventId);
   const [selectedTicketTypeId, setSelectedTicketTypeId] = useState<number | null>(null);
-  const [numberOfTickets, setNumberOfTickets] = useState<number>(0);
+  const [numberOfTickets, setNumberOfTickets] = useState(0);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const selectedType = event?.ticketTypes.find((type) => type.id === selectedTicketTypeId);
+  const maximumTickets = Math.min(selectedType?.available ?? 0, 50);
 
-  const handleBook = async () => {
+  async function handleBook(submitEvent: FormEvent<HTMLFormElement>) {
+    submitEvent.preventDefault();
     setMessage(null);
 
-    // Validation checks
-    if (selectedTicketTypeId === null) {
+    if (!selectedType) {
       setMessage({ type: "error", text: "Please select a ticket type." });
       return;
     }
-    if (numberOfTickets <= 0) {
-      setMessage({ type: "error", text: "Please select the number of tickets." });
+    if (numberOfTickets < 1 || numberOfTickets > selectedType.available) {
+      setMessage({ type: "error", text: "Please select an available number of tickets." });
       return;
     }
-
-    const selectedType = event?.ticketTypes.find(
-      type => type.id === selectedTicketTypeId
-    );
-
-    if (!selectedType) {
-      setMessage({ type: "error", text: "Selected ticket type is invalid." });
-      return;
-    }
-
-    if (numberOfTickets > selectedType.available) {
-      setMessage({
-        type: "error",
-        text: "Not enough available tickets."
-      });
-      return;
-    }
-
-    const payload = { eventId: event?.eventId, ticketTypeId: selectedTicketTypeId, numberOfTickets };
 
     try {
       setIsSubmitting(true);
-
       const response = await fetch("http://localhost:8080/api/Booking/createBooking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ eventId: event?.eventId, ticketTypeId: selectedType.id, numberOfTickets }),
       });
 
-        if (!response.ok) {
-        throw new Error("Failed to create booking.");
-      }
-
+      if (!response.ok) throw new Error("Failed to create booking.");
       const booking = await response.json();
-
-      setMessage({ type: "success", text: `Your booking is ${booking.bookingStatus.toLowerCase()}!` });
+      setMessage({ type: "success", text: `Your booking is ${String(booking.bookingStatus).toLowerCase()}.` });
       setSelectedTicketTypeId(null);
       setNumberOfTickets(0);
-
-    } catch (error: unknown) {
-      setMessage({
-        type: "error",
-        text: error instanceof Error ? error.message : "Something went wrong.",
-      });
+    } catch (error) {
+      setMessage({ type: "error", text: error instanceof Error ? error.message : "Something went wrong." });
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  if (eventIsLoading) {
-    return <div>Loading...</div>;
   }
 
-  if (eventError) {
-    return <div>{eventError}</div>;
-  }
+  if (isLoading) return <main className="page page--narrow"><p className="page-message">Loading event...</p></main>;
+  if (eventError) return <main className="page page--narrow"><p className="page-message page-message--error">{eventError}</p></main>;
+  if (!event) return <main className="page page--narrow"><p className="page-message">Event not found.</p></main>;
 
-  if (!event) {
-    return <div>Event not found</div>;
-  }
-  if (event.ticketTypes)
-    return (
-      <>
-        {message && (
-          <p style={{ color: message.type === "success" ? "green" : "red" }}>
+  return (
+    <main className="page page--narrow">
+      <header className="page-header">
+        <div><h1>Book tickets</h1><p>{event.title}</p></div>
+      </header>
+
+      <form className="panel form" onSubmit={handleBook}>
+        <div className="form-field">
+          <label htmlFor="ticket-type">Ticket type</label>
+          <select
+            id="ticket-type"
+            value={selectedTicketTypeId ?? ""}
+            onChange={(changeEvent) => {
+              setSelectedTicketTypeId(changeEvent.target.value ? Number(changeEvent.target.value) : null);
+              setNumberOfTickets(0);
+            }}
+          >
+            <option value="">Select a ticket</option>
+            {event.ticketTypes.map((type) => (
+              <option key={type.id} value={type.id} disabled={type.available === 0}>
+                {type.name} — {Number(type.price).toFixed(2)} €
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="ticket-quantity">Quantity</label>
+          <select
+            id="ticket-quantity"
+            value={numberOfTickets || ""}
+            disabled={!selectedType}
+            onChange={(changeEvent) => setNumberOfTickets(Number(changeEvent.target.value))}
+          >
+            <option value="">Select quantity</option>
+            {Array.from({ length: maximumTickets }, (_, index) => (
+              <option key={index + 1} value={index + 1}>{index + 1}</option>
+            ))}
+          </select>
+        </div>
+
+        {message ? (
+          <p className={`page-message page-message--${message.type}`} role={message.type === "error" ? "alert" : undefined}>
             {message.text}
           </p>
-        )}
+        ) : null}
 
-        <h1>Booking for: {event.title}</h1>
-        <>
-          <p>
-            Select type of ticket:
-            {/* Added value selection binding */}
-            <select value={selectedTicketTypeId || ""} onChange={(e) => setSelectedTicketTypeId(e.target.value ? Number(e.target.value) : null)}>
-              <option value="" >-- Select --</option>
-              {event.ticketTypes.map((type) => (
-                <option key={type.id} value={type.id} disabled={type.available === 0}>
-                  {type.name} - {type.price}€
-                </option>
-              ))}
-            </select>
-          </p>
-
-          <p>
-            Select number of tickets:
-            {/* Added value selection binding */}
-            <select value={numberOfTickets} onChange={(e) => setNumberOfTickets(Number(e.target.value))} disabled={!selectedTicketTypeId}>
-              <option value="">--Select-- </option>
-              {event.ticketTypes.map((type) => (type.id === selectedTicketTypeId &&
-                Array.from(
-                  { length: type.available <= 50 ? type.available : 50 }, (_, i) => (
-                    <option key={i} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  )
-                )))}
-            </select>
-          </p>
-
-          <div className="booking-buttons">
-            <button onClick={() => window.location.href = `/events/${eventId}`}>
-              Back to Events
-            </button>
-
-            <button onClick={handleBook} disabled={isSubmitting}>
-              {isSubmitting ? "Booking..." : "Confirm Booking"}
-            </button>
-
-          </div>
-        </>
-      </>
-    );
-};
-
-export default Booking;
+        <div className="page-actions">
+          <Link className="button button--secondary" to={`/events/${eventId}`}>Cancel</Link>
+          <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Booking..." : "Confirm booking"}</Button>
+        </div>
+      </form>
+    </main>
+  );
+}
