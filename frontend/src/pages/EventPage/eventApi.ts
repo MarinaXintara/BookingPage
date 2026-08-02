@@ -3,15 +3,18 @@ export interface Event {
   title: string;
   category: string;
   eventType: string;
+  venue?: string;
   address: string;
-  geoLocation: { latitude: number; longitude: number };
+  city?: string;
+  country?: string;
+  geoLocation: { latitude: number; longitude: number } | null;
   startDateTime: string;
   endDateTime: string;
   capacity: number;
   ticketTypes: TicketType[];
-  organiserUserId?: number;
   status?: string;
   description?: string;
+  organizerName?: string;
   media?: Media[];
 
 }
@@ -35,32 +38,53 @@ interface BackendEvent {
   title: string;
   category: string;
   eventType: string;
+  venue?: string;
   address: string;
+  city?: string;
+  country?: string;
   latitude: number | null;
   longitude: number | null;
   startDateTime: string;
   endDateTime: string;
   capacity: number;
+  status?: string;
+  description?: string;
+  organizer?: {
+    firstName?: string;
+    lastName?: string;
+  } | null;
   ticketTypes?: TicketType[];
 }
 
 const API_URL = 'http://localhost:8080/api/events';
 
 function toEvent(event: BackendEvent): Event {
+  const organizerName = [
+    event.organizer?.firstName,
+    event.organizer?.lastName,
+  ].filter(Boolean).join(" ");
+
+  const hasCoordinates = typeof event.latitude === "number"
+    && typeof event.longitude === "number";
 
   return {
     eventId: String(event.id),
     title: event.title,
     category: event.category,
     eventType: event.eventType,
+    venue: event.venue,
     address: event.address,
-    geoLocation: {
-      latitude: event.latitude ?? 0,
-      longitude: event.longitude ?? 0,
-    },
+    city: event.city,
+    country: event.country,
+    geoLocation: hasCoordinates
+      ? { latitude: event.latitude as number, longitude: event.longitude as number }
+      : null,
     startDateTime: event.startDateTime,
     endDateTime: event.endDateTime,
     capacity: event.capacity,
+    status: event.status,
+    description: event.description,
+    organizerName: organizerName || undefined,
     ticketTypes: event.ticketTypes ?? [],
   };
 }

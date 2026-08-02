@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../Auth/useAuth.ts";
-import "./UserIconComponent.css";
+import Button from "../Button.tsx";
 
 export default function UserIconComponent() {
   const { user, loading, logout } = useAuth();
@@ -32,7 +32,7 @@ export default function UserIconComponent() {
     try {
       await logout();
       setIsOpen(false);
-      navigate("/login");
+      navigate("/");
     } catch {
       setLogoutError("Could not log out. Please try again.");
     } finally {
@@ -66,14 +66,13 @@ export default function UserIconComponent() {
             My bookings
           </Link>
 
-          <button
-            className="logout-button"
-            type="button"
+          <Button
+            variant="secondary"
             disabled={isLoggingOut}
             onClick={handleLogout}
           >
             {isLoggingOut ? "Logging out..." : "Logout"}
-          </button>
+          </Button>
 
           {logoutError && (
             <span className="logout-error" role="alert">

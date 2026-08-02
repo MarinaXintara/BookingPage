@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../Auth/useAuth.ts";
 import UserIconComponent from "../UserIcon/UserIconComponent.tsx";
-import "./NavBar.css";
 
 export default function NavBar() {
   const { user } = useAuth();
@@ -11,20 +10,24 @@ export default function NavBar() {
   return (
     <nav className="topnav" aria-label="Main navigation">
       <div className="nav-links">
-        <NavLink className={linkClassName} to="/home">
-          Home
-        </NavLink>
+        {user ? (
+          <NavLink className={linkClassName} to="/home">
+            Home
+          </NavLink>
+        ) : null}
         <NavLink className={linkClassName} to="/events">
           Events
         </NavLink>
-        {user?.role === "USER" || user?.role === "ORGANIZER" ? (
+        {user ? (
           <NavLink className={linkClassName} to="/messaging">
             Messaging
           </NavLink>
         ) : null}
-        <NavLink className={linkClassName} to="/users">
-          Users
-        </NavLink>
+        {user?.role === "ADMIN" ? (
+          <NavLink className={linkClassName} to="/users">
+            Users
+          </NavLink>
+        ) : null}
       </div>
 
       <UserIconComponent />

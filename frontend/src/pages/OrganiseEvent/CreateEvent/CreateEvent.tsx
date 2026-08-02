@@ -1,235 +1,129 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Button from "../../../components/Button";
+import EventFormFields from "../EventFormFields";
+import {
+  emptyEventFormData,
+  getScheduleError,
+  type EventFormData,
+  type EventStatus,
+} from "../eventForm";
+
+interface TicketDraft {
+  key: string;
+  name: string;
+  price: string;
+  quantity: string;
+}
+
+type TicketField = "name" | "price" | "quantity";
+
+function createTicketDraft(): TicketDraft {
+  return { key: crypto.randomUUID(), name: "", price: "0", quantity: "1" };
+}
 
 export default function CreateEvent() {
-    const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const [message, setMessage] = useState("");
+  const [submittingStatus, setSubmittingStatus] = useState<EventStatus | null>(null);
+  const [eventData, setEventData] = useState<EventFormData>(() => ({ ...emptyEventFormData }));
+  const [ticketTypes, setTicketTypes] = useState<TicketDraft[]>(() => [createTicketDraft()]);
 
-    const [ticketTypes, setTicketTypes] = useState([
-        {
-            name: "",
-            price: 0,
-            quantity: 0,
-        },
-    ]);
+  function addTicketType() {
+    setTicketTypes((current) => [...current, createTicketDraft()]);
+  }
 
-    const addTicketType = () => {
-        setTicketTypes([
-            ...ticketTypes,
-            {
-                name: "",
-                price: 0,
-                quantity: 0,
-            },
-        ]);
+  function updateTicketType(index: number, field: TicketField, value: string) {
+    setTicketTypes((current) => current.map((ticket, ticketIndex) => (
+      ticketIndex === index
+        ? { ...ticket, [field]: value }
+        : ticket
+    )));
+  }
+
+  function removeTicketType(index: number) {
+    setTicketTypes((current) => current.filter((_, ticketIndex) => ticketIndex !== index));
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage("");
+
+    const scheduleError = getScheduleError(eventData.startDateTime, eventData.endDateTime);
+    if (scheduleError) {
+      setMessage(scheduleError);
+      return;
+    }
+
+    const capacity = Number(eventData.capacity);
+    const totalTickets = ticketTypes.reduce((sum, ticket) => sum + Number(ticket.quantity), 0);
+
+    if (totalTickets > capacity) {
+      setMessage("Total ticket quantity cannot exceed event capacity.");
+      return;
+    }
+
+    const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+    const status: EventStatus = submitter?.value === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
+    const data = {
+      ...eventData,
+      capacity,
+      status,
+      ticketTypes: ticketTypes.map(({ name, price, quantity }) => ({
+        name,
+        price: Number(price),
+        quantity: Number(quantity),
+      })),
     };
 
-    const updateTicketType = (
-        index: number,
-        field: string,
-        value: string | number
-    ) => {
-        const updatedTickets = [...ticketTypes];
+    try {
+      setSubmittingStatus(status);
+      const response = await fetch("http://localhost:8080/api/events/createEvent", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-        updatedTickets[index] = {
-            ...updatedTickets[index],
-            [field]:
-                field === "price" || field === "quantity"
-                    ? Number(value)
-                    : value,
-        };
+      if (!response.ok) throw new Error("Failed to create event.");
+      navigate("/events");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not create event.");
+    } finally {
+      setSubmittingStatus(null);
+    }
+  }
 
-        setTicketTypes(updatedTickets);
-    };
+  return (
+    <main className="page page--narrow">
+      <header className="page-header"><div><h1>Create event</h1><p>Enter the event and ticket details.</p></div></header>
+      <form className="panel form" onSubmit={handleSubmit}>
+        <EventFormFields idPrefix="event" value={eventData} onChange={setEventData} />
 
-    const handleSubmit = async (
-        event: React.FormEvent<HTMLFormElement>
-    ) => {
-        event.preventDefault();
+        <fieldset>
+          <legend>Ticket types</legend>
+          {ticketTypes.map((ticket, index) => (
+            <div className="ticket-form" key={ticket.key}>
+              <div className="form-field"><label htmlFor={`ticket-name-${index}`}>Name</label><input id={`ticket-name-${index}`} value={ticket.name} onChange={(event) => updateTicketType(index, "name", event.target.value)} required /></div>
+              <div className="form-field"><label htmlFor={`ticket-price-${index}`}>Price (€)</label><input id={`ticket-price-${index}`} type="number" min="0" step="0.01" value={ticket.price} onChange={(event) => updateTicketType(index, "price", event.target.value)} required /></div>
+              <div className="form-field"><label htmlFor={`ticket-quantity-${index}`}>Quantity</label><input id={`ticket-quantity-${index}`} type="number" min="1" value={ticket.quantity} onChange={(event) => updateTicketType(index, "quantity", event.target.value)} required /></div>
+              {ticketTypes.length > 1 ? <Button variant="secondary" onClick={() => removeTicketType(index)}>Remove</Button> : null}
+            </div>
+          ))}
+          <Button variant="secondary" onClick={addTicketType}>Add ticket type</Button>
+        </fieldset>
 
-        setMessage("Submitting...");
-
-        const form = event.currentTarget;
-
-        const formData = new FormData(form);
-
-        const capacity = Number(formData.get("capacity"));
-
-        const totalTickets = ticketTypes.reduce(
-            (sum, ticket) => sum + ticket.quantity,
-            0
-        );
-
-        if (totalTickets > capacity) {
-            setMessage(
-                "Total ticket quantity cannot exceed event capacity."
-            );
-            return;
-        }
-
-        const data = {
-            title: formData.get("title"),
-            category: formData.get("category"),
-            eventType: formData.get("eventType"),
-            venue: formData.get("venue"),
-            address: formData.get("address"),
-            city: formData.get("city"),
-            country: formData.get("country"),
-            startDateTime: formData.get("startDateTime"),
-            endDateTime: formData.get("endDateTime"),
-            capacity: capacity,
-            description: formData.get("description"),
-
-            // Ignore imageUrl for now
-            ticketTypes: ticketTypes,
-        };
-
-        try {
-            const response = await fetch(
-                "http://localhost:8080/api/events/createEvent",
-                {
-                    method: "POST",
-                    credentials:"include",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(data),
-                }
-            );
-
-            if (response.ok) {
-                const createdEvent = await response.json();
-
-                console.log(createdEvent);
-
-                setMessage("Event created successfully!");
-
-               form.reset();
-
-                setTicketTypes([
-                    {
-                        name: "",
-                        price: 0,
-                        quantity: 0,
-                    },
-                ]);
-            } else {
-                const error = await response.text();
-                console.error(error);
-                setMessage("Failed to create event.");
-            }
-        } catch (err) {
-            console.error(err);
-            setMessage("Could not connect to the backend.");
-        }
-    };
-
-    return (
-        <div>
-            <form
-                onSubmit={handleSubmit}
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    maxWidth: "300px",
-                    gap: "10px",
-                }}
-            >
-                <label>Title:</label>
-                <input type="text" name="title" required />
-
-                <label>Category:</label>
-                <input type="text" name="category" />
-
-                <label>Event Type:</label>
-                <input type="text" name="eventType" />
-
-                <label>Venue:</label>
-                <input type="text" name="venue" />
-
-                <label>Address:</label>
-                <input type="text" name="address" />
-
-                <label>City:</label>
-                <input type="text" name="city" />
-
-                <label>Country:</label>
-                <input type="text" name="country" />
-
-                <label>Start Date Time:</label>
-                <input type="datetime-local" name="startDateTime" />
-
-                <label>End Date Time:</label>
-                <input type="datetime-local" name="endDateTime" />
-
-                <label>Capacity:</label>
-                <input type="number" name="capacity" min="1" />
-
-                <fieldset>
-                    <legend>Ticket Types</legend>
-
-                    {ticketTypes.map((ticket, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                borderBottom: "1px solid #ccc",
-                                marginBottom: "10px",
-                                paddingBottom: "10px",
-                            }}
-                        >
-                            <label>Name:</label>
-                            <input
-                                value={ticket.name}
-                                onChange={(e) =>
-                                    updateTicketType(index, "name", e.target.value)
-                                }
-                            />
-
-                            <label>Price:</label>
-                            <input
-                                type="number"
-                                value={ticket.price}
-                                onChange={(e) =>
-                                    updateTicketType(index, "price", e.target.value)
-                                }
-                            />
-
-                            <label>Quantity:</label>
-                            <input
-                                type="number"
-                                value={ticket.quantity}
-                                onChange={(e) =>
-                                    updateTicketType(index, "quantity", e.target.value)
-                                }
-                            />
-                        </div>
-                    ))}
-
-                    <button
-                        type="button"
-                        onClick={addTicketType}
-                    >
-                        + Add Ticket Type
-                    </button>
-                </fieldset>
-
-                <input
-                    type="text"
-                    name="description"
-                    placeholder="Description"
-                />
-
-                <input
-                    type="text"
-                    name="imageUrl"
-                    placeholder="Image URL"
-                />
-
-                <button type="submit"
-                    onClick={()=>(window.location.href="/events")}>
-                        Publish
-                </button>
-            </form>
-
-            {message && <p>{message}</p>}
+        {message ? <p className="page-message page-message--error" role="alert">{message}</p> : null}
+        <div className="page-actions">
+          <Link className="button button--secondary" to="/events">Cancel</Link>
+          <Button type="submit" variant="secondary" value="DRAFT" disabled={submittingStatus !== null}>
+            {submittingStatus === "DRAFT" ? "Saving..." : "Save as draft"}
+          </Button>
+          <Button type="submit" value="PUBLISHED" disabled={submittingStatus !== null}>
+            {submittingStatus === "PUBLISHED" ? "Publishing..." : "Publish"}
+          </Button>
         </div>
-    );
+      </form>
+    </main>
+  );
 }

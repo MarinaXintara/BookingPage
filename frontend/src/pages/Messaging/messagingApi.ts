@@ -1,6 +1,5 @@
 import type { Role } from "../../Auth/Authentication";
 
-export type MessagingRole = Exclude<Role, "ADMIN">;
 export type MessageFolder = "inbox" | "sent";
 
 export interface MessageContact {
@@ -42,7 +41,25 @@ const MOCK_DELAY_MS = 180;
 // MOCK BACKEND START
 // Replace the data and exported function bodies below with fetch requests when
 // the messaging backend is available. The UI does not use mock data directly.
-const mockMailboxes: Record<MessagingRole, MockMailbox> = {
+const mockMailboxes: Record<Role, MockMailbox> = {
+  ADMIN: {
+    contacts: [
+      {
+        userId: 2,
+        name: "Olivia Papadopoulos",
+        eventId: 21,
+        eventTitle: "Open Air Cinema",
+      },
+      {
+        userId: 3,
+        name: "Nikos Georgiou",
+        eventId: 11,
+        eventTitle: "Summer Concert",
+      },
+    ],
+    inbox: [],
+    sent: [],
+  },
   USER: {
     contacts: [
       {
@@ -200,7 +217,7 @@ function copyMessages(messages: Message[]): Message[] {
 }
 
 export async function getInbox(
-  role: MessagingRole,
+  role: Role,
   signal?: AbortSignal,
 ): Promise<Message[]> {
   await waitForMock(signal);
@@ -208,7 +225,7 @@ export async function getInbox(
 }
 
 export async function getSentMessages(
-  role: MessagingRole,
+  role: Role,
   signal?: AbortSignal,
 ): Promise<Message[]> {
   await waitForMock(signal);
@@ -216,7 +233,7 @@ export async function getSentMessages(
 }
 
 export async function getAvailableRecipients(
-  role: MessagingRole,
+  role: Role,
   signal?: AbortSignal,
 ): Promise<MessageContact[]> {
   await waitForMock(signal);
@@ -224,7 +241,7 @@ export async function getAvailableRecipients(
 }
 
 export async function sendMessage(
-  role: MessagingRole,
+  role: Role,
   input: SendMessageInput,
 ): Promise<Message> {
   await waitForMock();
@@ -241,7 +258,7 @@ export async function sendMessage(
 
   const message: Message = {
     id: `mock-message-${Date.now()}`,
-    senderId: role === "USER" ? 1 : 2,
+    senderId: role === "ORGANIZER" ? 2 : 1,
     senderName: "You",
     receiverId: contact.userId,
     receiverName: contact.name,
@@ -258,7 +275,7 @@ export async function sendMessage(
 }
 
 export async function markMessageAsRead(
-  role: MessagingRole,
+  role: Role,
   messageId: string,
 ): Promise<void> {
   await waitForMock();
@@ -274,7 +291,7 @@ export async function markMessageAsRead(
 }
 
 export async function deleteMessage(
-  role: MessagingRole,
+  role: Role,
   folder: MessageFolder,
   messageId: string,
 ): Promise<void> {

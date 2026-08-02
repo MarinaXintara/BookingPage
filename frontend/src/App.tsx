@@ -10,7 +10,6 @@ import { Home } from './pages/HomePage/Home.tsx';
 import Login from "./pages/LoginPage/Login.tsx";
 import Messaging from './pages/Messaging/Messaging.tsx';
 import CreateEvent from './pages/OrganiseEvent/CreateEvent/CreateEvent.tsx';
-import DeleteButton from './pages/OrganiseEvent/DeleteEvent/DeleteEvent.tsx';
 import EditEvent from './pages/OrganiseEvent/EditEvent/EditEvent.tsx';
 import Registration from "./pages/registerPage/registerPage.tsx";
 import UserDetailsPage from './pages/UserDetailsPage/UserDetailsPage.tsx';
@@ -39,7 +38,6 @@ function App() {
               <Route path="/users/:userId" element={<UserDetailsPage />} />
               <Route path="/createEvent" element={<CreateEvent />} />
               <Route path="/editEvent/:eventId" element={<EditEvent />} />
-              <Route path="/deleteEvent/:eventId" element={<DeleteButton />} />
               <Route path="/myBookings" element={<GetBookings />} />
               <Route path="/profile" element={<Profile />} />
             </Route>

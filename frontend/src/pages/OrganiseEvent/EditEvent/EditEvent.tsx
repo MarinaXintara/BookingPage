@@ -1,112 +1,125 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState, type FormEvent } from "react";
+import { Link, useParams } from "react-router-dom";
+import Button from "../../../components/Button";
+import { fetchEvent } from "../../EventPage/eventApi";
+import EventFormFields from "../EventFormFields";
+import {
+  emptyEventFormData,
+  getScheduleError,
+  type EventFormData,
+  type EventStatus,
+} from "../eventForm";
 
+interface Feedback {
+  text: string;
+  type: "error" | "success";
+}
+
+function toDateTimeInput(value?: string | null) {
+  return value ? value.slice(0, 16) : "";
+}
 
 export default function EditEvent() {
   const { eventId } = useParams();
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [eventData, setEventData] = useState<EventFormData>(() => ({ ...emptyEventFormData }));
+  const [status, setStatus] = useState<EventStatus>("DRAFT");
 
-  const [message, setMessage] = useState('');
-
-
-  const [eventData, setEventData] = useState({
-    title: "",
-    category: "",
-    capacity: "1"
-  })
-
-  //Loading event
   useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:8080/api/events/${eventId}`
-        );
+    const controller = new AbortController();
 
-        const data = await response.json();
+    if (!eventId) {
+      setFeedback({ text: "Could not load event.", type: "error" });
+      setIsLoading(false);
+      return () => controller.abort();
+    }
 
-        setEventData(data);
-      } catch (err) {
-        console.error(err);
-        setMessage("Could not load event.");
-      }
-    };
+    fetchEvent(eventId, controller.signal)
+      .then((data) => {
+        setEventData({
+          title: data.title ?? "",
+          category: data.category ?? "",
+          eventType: data.eventType ?? "",
+          venue: data.venue ?? "",
+          address: data.address ?? "",
+          city: data.city ?? "",
+          country: data.country ?? "",
+          startDateTime: toDateTimeInput(data.startDateTime),
+          endDateTime: toDateTimeInput(data.endDateTime),
+          capacity: String(data.capacity ?? 1),
+          description: data.description ?? "",
+        });
+        setStatus((data.status as EventStatus | undefined) ?? "DRAFT");
+      })
+      .catch((error: unknown) => {
+        if (!(error instanceof DOMException && error.name === "AbortError")) {
+          setFeedback({ text: "Could not load event.", type: "error" });
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoading(false);
+      });
 
-    fetchEvent();
+    return () => controller.abort();
   }, [eventId]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFeedback(null);
 
+    const scheduleError = getScheduleError(eventData.startDateTime, eventData.endDateTime);
+    if (scheduleError) {
+      setFeedback({ text: scheduleError, type: "error" });
+      return;
+    }
 
-    const data = {
-      id: Number(eventId),
-      title: eventData.title,
-      category: eventData.category,
-      capacity: Number(eventData.capacity),
-    };
+    setIsSubmitting(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:8080/api/events/editEvent",
-        {
-          method: "PATCH",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      if (response.ok) {
-        setMessage("Event updated successfully!");
-      } else {
-        setMessage("Failed to update event.");
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage("Could not connect to backend.");
+      const response = await fetch("http://localhost:8080/api/events/editEvent", {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: Number(eventId),
+          ...eventData,
+          capacity: Number(eventData.capacity),
+          status,
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to update event.");
+      setFeedback({ text: "Event updated successfully.", type: "success" });
+    } catch (error) {
+      setFeedback({
+        text: error instanceof Error ? error.message : "Could not update event.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-  };
-  if (!eventData) {
-    return <p>Loading...</p>;
   }
 
+  if (isLoading) return <main className="page page--narrow"><p className="page-message">Loading event...</p></main>;
+
   return (
-    <div>
-
-
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px', gap: '10px' }}>
-
-        <label htmlFor="title">Title:</label>
-        <input type="text" value={eventData.title} onChange={(e) => setEventData({ ...eventData, title: e.target.value, })}
-        />
-        <input
-          type="text"
-          value={eventData.category}
-          onChange={(e) =>
-            setEventData({
-              ...eventData,
-              category: e.target.value,
-            })
-          }
-        />
-        <input
-          type="number"
-          value={eventData.capacity}
-          min="1"
-          onChange={(e) =>
-            setEventData({
-              ...eventData,
-              capacity: (e.target.value),
-            })
-          }
-        />
-
-        <button type="submit">Save Changes</button>
+    <main className="page page--narrow">
+      <header className="page-header"><div><h1>Edit event</h1></div></header>
+      <form className="panel form" onSubmit={handleSubmit}>
+        <EventFormFields idPrefix="edit" value={eventData} onChange={setEventData} />
+        <div className="form-field">
+          <label htmlFor="edit-status">Status</label>
+          <select id="edit-status" value={status} onChange={(event) => setStatus(event.target.value as EventStatus)}>
+            <option value="DRAFT">Draft</option>
+            <option value="PUBLISHED">Published</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
+        {feedback ? <p className={`page-message page-message--${feedback.type}`} role="status">{feedback.text}</p> : null}
+        <div className="page-actions"><Link className="button button--secondary" to={`/events/${eventId}`}>Cancel</Link><Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving..." : "Save changes"}</Button></div>
       </form>
-
-      {message && <p><strong>{message}</strong></p>}
-    </div>
+    </main>
   );
 }

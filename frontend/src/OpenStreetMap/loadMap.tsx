@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { map, tileLayer, marker } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "./loadMap.css";
 
 
 interface EventMapProps {
@@ -49,13 +48,5 @@ export default function EventMap({
   }, [latitude, longitude, title]);
 
 
-  return (
-    <div
-      id="event-map"
-      style={{
-        height: "400px",
-        width: "100%"
-      }}
-    />
-  );
+  return <div id="event-map" />;
 }
