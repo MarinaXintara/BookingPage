@@ -1,6 +1,21 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "../../Auth/useAuth";
 
 export default function Welcome() {
+
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <p aria-live="polite">Checking session...</p>;
+  }
+
+  if (user) {
+    return <Navigate
+      to="/home"
+      replace
+    />
+  }
+
   return (
     <main className="welcome-page">
       <h1>Welcome to BookIT</h1>

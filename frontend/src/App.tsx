@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './Auth/AuthProvider.tsx';
-import AdminRoute from './components/AdminRoute.tsx';
 import { PrivateRoute } from './components/PrivateRoute.tsx';
 
 import Layout from './Layout.tsx';
@@ -10,14 +9,14 @@ import EventPage from './pages/EventPage/EventPage.tsx';
 import { Home } from './pages/HomePage/Home.tsx';
 import Login from "./pages/LoginPage/Login.tsx";
 import Messaging from './pages/Messaging/Messaging.tsx';
+import GetBookings from './pages/myBookings/myBookings.tsx';
 import CreateEvent from './pages/OrganiseEvent/CreateEvent/CreateEvent.tsx';
 import EditEvent from './pages/OrganiseEvent/EditEvent/EditEvent.tsx';
+import Profile from './pages/profile/Profile.tsx';
 import Registration from "./pages/registerPage/registerPage.tsx";
 import UserDetailsPage from './pages/UserDetailsPage/UserDetailsPage.tsx';
 import UsersPage from './pages/UsersPage/UsersPage.tsx';
 import Welcome from './pages/WelcomePage/Welcome.tsx';
-import GetBookings from './pages/myBookings/myBookings.tsx';
-import Profile from './pages/profile/Profile.tsx';
 
 function App() {
   return (
@@ -35,10 +34,8 @@ function App() {
               <Route path="/home" element={<Home />} />
               <Route path="/booking/:eventId" element={<BookingPage />} />
               <Route path="/messaging" element={<Messaging />} />
-              <Route element={<AdminRoute />}>
-                <Route path="/users" element={<UsersPage />} />
-                <Route path="/users/:userId" element={<UserDetailsPage />} />
-              </Route>
+              <Route path="/users" element={<UsersPage />} />
+              <Route path="/users/:userId" element={<UserDetailsPage />} />
               <Route path="/createEvent" element={<CreateEvent />} />
               <Route path="/editEvent/:eventId" element={<EditEvent />} />
               <Route path="/myBookings" element={<GetBookings />} />

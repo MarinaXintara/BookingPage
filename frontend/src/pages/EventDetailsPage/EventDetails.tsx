@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../Auth/useAuth";
 import { useFetchEvent } from "../../components/helper";
 import EventMap from "../../OpenStreetMap/loadMap";
+import DeleteButton from "../OrganiseEvent/DeleteEvent/DeleteButton";
 
 export default function EventDetailsPage() {
   const { eventId } = useParams<{ eventId: string }>();
@@ -64,6 +65,7 @@ export default function EventDetailsPage() {
           {canManage ? (
             <Link className="button button--secondary" to={`/editEvent/${event.eventId}`}>Edit event</Link>
           ) : null}
+          <DeleteButton eventId={event.eventId} />
         </div>
       </article>
     </main>
