@@ -1,11 +1,14 @@
 package com.eventPlatform.backend.controller;
+
+import com.eventPlatform.backend.DTO.LoginRequest;
+import com.eventPlatform.backend.DTO.LoginResponse;
 import com.eventPlatform.backend.DTO.UserResponse;
 import com.eventPlatform.backend.entity.User;
+import com.eventPlatform.backend.jwt.JwtService;
 import com.eventPlatform.backend.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -14,28 +17,29 @@ public class AuthController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthController(UserService userService, PasswordEncoder passwordEncoder){
+    public AuthController(UserService userService, PasswordEncoder passwordEncoder ,JwtService jwtService){
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
 
     @PostMapping("/login")
-    public String loginUser(@RequestBody User user, HttpSession session) {
-
-        User existingUser = userService.findByEmail(user.getEmail());
+    public LoginResponse loginUser(@RequestBody LoginRequest request) {
+        User existingUser = userService.findByEmail(request.getEmail());
 
         if(existingUser == null) {
             throw new RuntimeException("Invalid credentials");
         }
 
-        if(!passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
+        if(!passwordEncoder.matches(request.getPassword(), existingUser.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
-        session.setAttribute("userId", existingUser.getId());
 
-        return "success";
+        String token = jwtService.generateToken(existingUser);
+        return new LoginResponse(token);
     }
 
 
@@ -51,13 +55,10 @@ public class AuthController {
 
 
     @GetMapping("/me")
-    public UserResponse me(HttpSession session){
+    public UserResponse me(Authentication authentication){
 
-        Long userId = (Long) session.getAttribute("userId");
+        Long userId = Long.parseLong(authentication.getName());
 
-        if(userId == null){
-            throw new RuntimeException("Not logged in");
-        }
         User user = userService.findById(userId);
 
         if(user == null){
@@ -67,20 +68,18 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public String logout(HttpSession session) {
-
-        session.invalidate();
-
+    public String logout() {
         return "Logged out successfully";
     }
 
     @GetMapping("/showUsers")
-    public List<User> ShowUsers(HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-
-        if(userId == null){
+    public List<User> ShowUsers(Authentication authentication) { //Fix this to use UserResponse so it doesn't send to front password
+        if(authentication == null || !authentication.isAuthenticated()){
             throw new RuntimeException("Not logged in");
         }
+
+        Long userId = Long.parseLong(authentication.getName());
+
         User user = userService.findById(userId);
         if(user == null){
             throw new RuntimeException("User not found");
@@ -97,8 +96,6 @@ public class AuthController {
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable Long id) {
-        System.out.println("GET USER CALLED WITH ID: " + id);
-
         User user = userService.findById(id);
 
         if(user == null) {
