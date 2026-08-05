@@ -4,8 +4,6 @@ export interface User {
   lastName: string;
   email: string;
   phoneNumber?: string | null;
-  address?: string | null;
-  tin?: string | null;
   role?: string | null;
 }
 
@@ -35,7 +33,6 @@ export async function fetchUser(userId: string): Promise<User> {
       "Content-Type": "application/json"
     }
   });
-  console.log(response.status);
   if (!response.ok) {
     throw new Error("Failed to fetch user");
   }
