@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './Auth/AuthProvider.tsx';
+import AdminRoute from './components/AdminRoute.tsx';
 import { PrivateRoute } from './components/PrivateRoute.tsx';
 
 import Layout from './Layout.tsx';
@@ -34,8 +35,10 @@ function App() {
               <Route path="/home" element={<Home />} />
               <Route path="/booking/:eventId" element={<BookingPage />} />
               <Route path="/messaging" element={<Messaging />} />
-              <Route path="/users" element={<UsersPage />} />
-              <Route path="/users/:userId" element={<UserDetailsPage />} />
+              <Route element={<AdminRoute />}>
+                <Route path="/users" element={<UsersPage />} />
+                <Route path="/users/:userId" element={<UserDetailsPage />} />
+              </Route>
               <Route path="/createEvent" element={<CreateEvent />} />
               <Route path="/editEvent/:eventId" element={<EditEvent />} />
               <Route path="/myBookings" element={<GetBookings />} />
