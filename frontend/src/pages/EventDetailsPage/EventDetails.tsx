@@ -65,7 +65,9 @@ export default function EventDetailsPage() {
           {canManage ? (
             <Link className="button button--secondary" to={`/editEvent/${event.eventId}`}>Edit event</Link>
           ) : null}
-          <DeleteButton eventId={event.eventId} />
+          {user?.role === "ADMIN" || user?.role==="ORGANIZER" && (
+            <DeleteButton eventId={event.eventId} />
+          )}
         </div>
       </article>
     </main>

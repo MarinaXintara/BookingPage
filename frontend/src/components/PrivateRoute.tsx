@@ -42,7 +42,6 @@ export const pagePermissions: Record<string, Role[]> = {
     "/events":              ["ADMIN", "ORGANIZER", "USER"],
     "/createEvent":         ["ADMIN", "ORGANIZER"],
     "/editEvent":           ["ADMIN", "ORGANIZER"],
-    "/deleteEvent":         ["ADMIN", "ORGANIZER"],
     "/profile":             ["ADMIN", "ORGANIZER", "USER"],
     "/booking":             ["ADMIN", "ORGANIZER", "USER"],
     "/myBookings":          ["ADMIN", "ORGANIZER", "USER"],
