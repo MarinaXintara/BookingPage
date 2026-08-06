@@ -2,6 +2,7 @@ package com.eventPlatform.backend.controller;
 
 import com.eventPlatform.backend.DTO.BookingRequest;
 import com.eventPlatform.backend.entity.Booking;
+import com.eventPlatform.backend.enums.BookingStatus;
 import com.eventPlatform.backend.jwt.JwtService;
 import com.eventPlatform.backend.service.BookingService;
 import jakarta.servlet.http.HttpSession;
@@ -58,6 +59,22 @@ public class BookingController {
 //    @PatchMapping("/editBooking")
 //    public Booking editEvent(@RequestBody Booking booking) {
 //    }
+
+    @PostMapping("{id}/status")
+    public String editBookingStatus(@PathVariable Long id, @RequestBody BookingStatus bookingStatus, Authentication authentication) {
+
+        if(authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Not logged in");
+        }
+        Booking booking = bookingService.findById(id);
+        if(booking == null) {
+            throw new RuntimeException("Booking not found");
+        }
+        booking.setBookingStatus(bookingStatus);
+        bookingService.saveBooking(booking);
+        return "Switched Booking Status";
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
