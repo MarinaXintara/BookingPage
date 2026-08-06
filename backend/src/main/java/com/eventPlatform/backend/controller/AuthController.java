@@ -1,14 +1,19 @@
 package com.eventPlatform.backend.controller;
 
 import com.eventPlatform.backend.DTO.LoginRequest;
-import com.eventPlatform.backend.DTO.LoginResponse;
 import com.eventPlatform.backend.DTO.UserResponse;
 import com.eventPlatform.backend.entity.User;
 import com.eventPlatform.backend.jwt.JwtService;
 import com.eventPlatform.backend.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -27,19 +32,25 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public LoginResponse loginUser(@RequestBody LoginRequest request) {
+    public String loginUser(@RequestBody LoginRequest request, HttpServletResponse response) {
         User existingUser = userService.findByEmail(request.getEmail());
 
-        if(existingUser == null) {
-            throw new RuntimeException("Invalid credentials");
-        }
-
-        if(!passwordEncoder.matches(request.getPassword(), existingUser.getPassword())) {
+        if(existingUser == null || !passwordEncoder.matches(request.getPassword(), existingUser.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
         String token = jwtService.generateToken(existingUser);
-        return new LoginResponse(token);
+
+        ResponseCookie cookie = ResponseCookie.from("jwt", token)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ofHours(24))
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        return "Logged in";
     }
 
 
@@ -68,12 +79,22 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public String logout() {
-        return "Logged out successfully";
+    public String logout(HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        return "Logged out";
     }
 
     @GetMapping("/showUsers")
-    public List<User> ShowUsers(Authentication authentication) { //Fix this to use UserResponse so it doesn't send to front password
+    public List<UserResponse> showUsers(Authentication authentication) {
+
         if(authentication == null || !authentication.isAuthenticated()){
             throw new RuntimeException("Not logged in");
         }
@@ -81,28 +102,32 @@ public class AuthController {
         Long userId = Long.parseLong(authentication.getName());
 
         User user = userService.findById(userId);
+
         if(user == null){
             throw new RuntimeException("User not found");
         }
 
-        String userRole = user.getRole();
-        if(!"ADMIN".equals(userRole) ){
+        if(!"ADMIN".equals(user.getRole())){
             throw new RuntimeException("Not Admin");
         }
-        List<User> allUsers = userService.getAllUsers();
-        return allUsers;
 
+        List<User> allUsers = userService.getAllUsers();
+        List<UserResponse> userResponses = new ArrayList<>();
+
+        for(User u : allUsers) {
+            userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getRole()));
+        }
+        return userResponses;
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable Long id) {
+    public UserResponse getUser(@PathVariable Long id) {
         User user = userService.findById(id);
-
-        if(user == null) {
+        if(user == null){
             throw new RuntimeException("User not found");
         }
 
-        return user;
+        return new UserResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole());
     }
 
 }

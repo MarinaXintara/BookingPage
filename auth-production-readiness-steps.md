@@ -21,7 +21,7 @@
    Μην επιστρεφεις απευθειας το `User` entity. Φτιαξε DTO, π.χ. `UserResponse`, χωρις `password`.
 
 5. **Διαλεξε auth τροπο** done
-
+   https://medium.com/@haflan395/complete-guide-to-implementing-jwt-authentication-with-cookies-and-local-storage-in-react-and-dc9225fe259b
    Η πιο καθαρη λυση για αυτο το app:
 
    - backend session cookie <-- this was done
