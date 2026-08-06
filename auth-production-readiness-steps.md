@@ -172,7 +172,7 @@
 3. User DTOs χωρις password.
 4. Register με hashed password και default role.
 5. Login με email/password.
-6. Session cookie ή JWT.
+6.  JWT με cookie.
 7. `/api/auth/me`.
 8. `/api/auth/logout`.
 9. Backend route protection.

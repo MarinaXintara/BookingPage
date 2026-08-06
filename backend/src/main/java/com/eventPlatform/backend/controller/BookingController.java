@@ -43,24 +43,28 @@ public class BookingController {
         }
         Long userId = Long.parseLong(authentication.getName());
 
+
         return bookingService.getBookingsByUser(userId);
     }
 
-    @PostMapping("/createBooking")
+   /*  @PostMapping("/createBooking")
     public Booking createBooking(@RequestBody BookingRequest request,Authentication authentication) {
         if(authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("Not logged in");
         }
         Long userId = Long.parseLong(authentication.getName());
+        TicketType ticket = ticketservice.findById(request.getTicketTypeId());
+        ticket.setQuantity(ticket.getQuantity() - request.getNumberOfTickets());
+        ticketService.saveTicket(ticket);
 
         return bookingService.createBooking(request, userId);
     }
-
+ */
 //    @PatchMapping("/editBooking")
 //    public Booking editEvent(@RequestBody Booking booking) {
 //    }
 
-    @PostMapping("{id}/status")
+   /*  @PostMapping("{id}/status")
     public String editBookingStatus(@PathVariable Long id, @RequestBody BookingStatus bookingStatus, Authentication authentication) {
 
         if(authentication == null || !authentication.isAuthenticated()) {
@@ -81,5 +85,5 @@ public class BookingController {
         bookingService.deleteBooking(id);
         return ResponseEntity.noContent().build();
     }
-
+ */
 }
