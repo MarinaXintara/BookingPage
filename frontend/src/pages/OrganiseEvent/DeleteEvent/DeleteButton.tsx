@@ -23,6 +23,7 @@ export default function DeleteButton({ eventId }: { eventId: string }) {
             // 2. Κάνουμε το DELETE request στο σωστό URL
             const response = await fetch(`http://localhost:8080/api/events/${eventId}`, {
                 method: 'DELETE',
+                credentials:"include"
             });
 
             if (response.ok) {

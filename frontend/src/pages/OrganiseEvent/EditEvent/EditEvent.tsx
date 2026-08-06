@@ -46,6 +46,8 @@ export default function EditEvent() {
           address: data.address ?? "",
           city: data.city ?? "",
           country: data.country ?? "",
+          latitude: data.geoLocation?.latitude ?? null,
+          longitude: data.geoLocation?.longitude ?? null,
           startDateTime: toDateTimeInput(data.startDateTime),
           endDateTime: toDateTimeInput(data.endDateTime),
           capacity: String(data.capacity ?? 1),
