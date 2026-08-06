@@ -17,32 +17,3 @@
     ({id}/read/):PutMapping για μαρκάρισμα διαβασμένων μηνυμάτων
     ("/{id}):deleleMapping για διαγραφή μηνυμάτων
 
-Φτιάξε οντότητες για τις αντίστοιχες διεπαφές:
- 
- export interface Message {
-  id: number;
-  senderId: number;
-  senderName: string;
-  receiverId: number;
-  receiverName: string;
-  eventId: number;
-  eventTitle: string;
-  subject: string;
-  body: string;
-  isRead: boolean;
-  createdAt: string;
-}
-
-export interface MessageContact {
-  userId: number;
-  name: string;
-  eventId: number;
-  eventTitle: string;
-}
-
-export interface SendMessageInput {
-  receiverId: number;
-  eventId: number;
-  subject: string;
-  body: string;
-}
