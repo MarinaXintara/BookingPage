@@ -1,4 +1,5 @@
 import type { EventFormData } from "./eventForm";
+import EventLocationPicker from "./EventLocationPicker";
 
 interface EventFormFieldsProps {
   idPrefix: string;
@@ -86,6 +87,25 @@ export default function EventFormFields({ idPrefix, value, onChange }: EventForm
           />
         </div>
       </div>
+
+      <EventLocationPicker
+        idPrefix={idPrefix}
+        address={[value.venue, value.address, value.city, value.country]
+          .map((part) => part.trim())
+          .filter(Boolean)
+          .join(", ")}
+        latitude={value.latitude}
+        longitude={value.longitude}
+        onLocationChange={({ latitude, longitude }) => onChange({ ...value, latitude, longitude })}
+        onLocationSelect={({ address, city, country, latitude, longitude }) => onChange({
+          ...value,
+          address,
+          city,
+          country,
+          latitude,
+          longitude,
+        })}
+      />
 
       <div className="form-row">
         <div className="form-field">

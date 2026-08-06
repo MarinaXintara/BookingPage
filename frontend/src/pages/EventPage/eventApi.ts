@@ -14,7 +14,7 @@ export interface Event {
   ticketTypes: TicketType[];
   status?: string;
   description?: string;
-  organizerName?: string;
+  organizer?:  {firstName: string; lastName:string; id:number;}
   media?: Media[];
 
 }
@@ -52,6 +52,7 @@ interface BackendEvent {
   organizer?: {
     firstName?: string;
     lastName?: string;
+    id?: number;
   } | null;
   ticketTypes?: TicketType[];
 }
@@ -59,10 +60,6 @@ interface BackendEvent {
 const API_URL = 'http://localhost:8080/api/events';
 
 function toEvent(event: BackendEvent): Event {
-  const organizerName = [
-    event.organizer?.firstName,
-    event.organizer?.lastName,
-  ].filter(Boolean).join(" ");
 
   const hasCoordinates = typeof event.latitude === "number"
     && typeof event.longitude === "number";
@@ -84,7 +81,10 @@ function toEvent(event: BackendEvent): Event {
     capacity: event.capacity,
     status: event.status,
     description: event.description,
-    organizerName: organizerName || undefined,
+    organizer: event.organizer ? {
+      firstName:event.organizer?.firstName as string,
+      lastName:event.organizer?.lastName as string,
+      id:event.organizer?.id as number} : undefined ,
     ticketTypes: event.ticketTypes ?? [],
   };
 }

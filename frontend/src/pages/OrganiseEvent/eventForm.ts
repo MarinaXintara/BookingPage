@@ -6,6 +6,8 @@ export interface EventFormData {
   address: string;
   city: string;
   country: string;
+  latitude: number | null;
+  longitude: number | null;
   startDateTime: string;
   endDateTime: string;
   capacity: string;
@@ -22,6 +24,8 @@ export const emptyEventFormData: EventFormData = {
   address: "",
   city: "",
   country: "",
+  latitude: null,
+  longitude: null,
   startDateTime: "",
   endDateTime: "",
   capacity: "1",

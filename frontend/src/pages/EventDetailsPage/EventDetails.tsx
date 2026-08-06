@@ -13,12 +13,20 @@ export default function EventDetailsPage() {
   if (error) return <main className="page"><p className="page-message page-message--error">{error}</p></main>;
   if (!event) return <main className="page"><p className="page-message">Event not found.</p></main>;
 
-  const canManage = user?.role === "ORGANIZER" || user?.role === "ADMIN";
+  const canManage = (user?.role === "ORGANIZER" && user?.id === event.organizer?.id) || user?.role === "ADMIN";
   const eventType = [event.category, event.eventType].filter(Boolean).join(" · ");
   const cityAndCountry = [event.city, event.country].filter(Boolean).join(", ");
   const statusLabel = event.status && event.status !== "PUBLISHED"
     ? event.status.toLowerCase()
     : null;
+
+  const organizerFullName = event.organizer ? [
+    event.organizer?.firstName,
+    event.organizer?.lastName,
+  ].filter(Boolean).join(" ") : undefined;
+
+
+
 
   return (
     <main className="page page--narrow">
@@ -31,7 +39,7 @@ export default function EventDetailsPage() {
 
       <article className="panel event-details">
         <dl className="details-list">
-          <div><dt>Organizer</dt><dd>{event.organizerName ?? "Not specified"}</dd></div>
+          <div><dt>Organizer</dt><dd>{organizerFullName ?? "Not specified"}</dd></div>
           {event.venue ? <div><dt>Venue</dt><dd>{event.venue}</dd></div> : null}
           {event.address ? <div><dt>Address</dt><dd>{event.address}</dd></div> : null}
           {cityAndCountry ? <div><dt>City and country</dt><dd>{cityAndCountry}</dd></div> : null}
@@ -56,18 +64,18 @@ export default function EventDetailsPage() {
         </section>
 
         {event.geoLocation ? (
-          <EventMap latitude={event.geoLocation.latitude} longitude={event.geoLocation.longitude} title={event.title} />
+          <EventMap latitude={event.geoLocation.latitude} longitude={event.geoLocation.longitude} title={event.venue ?? ''} />
         ) : null}
 
         <div className="page-actions">
           <Link className="button button--secondary" to="/events">Back to events</Link>
           <Link className="button" to={`/booking/${event.eventId}`}>Book tickets</Link>
           {canManage ? (
-            <Link className="button button--secondary" to={`/editEvent/${event.eventId}`}>Edit event</Link>
+            <>
+              <Link className="button button--secondary" to={`/editEvent/${event.eventId}`}>Edit event</Link>
+              <DeleteButton eventId={event.eventId} />
+            </>
           ) : null}
-          {user?.role === "ADMIN" || user?.role==="ORGANIZER" && (
-            <DeleteButton eventId={event.eventId} />
-          )}
         </div>
       </article>
     </main>
