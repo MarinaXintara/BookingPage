@@ -32,7 +32,7 @@ export function PrivateRoute() {
 
 }
 
-export const pagePermissions: Record<string, Role[]> = {
+const pagePermissions: Record<string, Role[]> = {
     "/home":                ["ADMIN", "ORGANIZER", "USER"],
     "/welcome":             ["ADMIN", "ORGANIZER", "USER"],
     "/login":               ["ADMIN", "ORGANIZER", "USER"],

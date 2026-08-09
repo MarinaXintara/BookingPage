@@ -7,6 +7,18 @@ interface RecommendedEvent {
 
 const RECOMMENDATIONS_API_URL = "http://localhost:8080/api/recommendations";
 
+export async function recordEventView(eventId: string, signal?: AbortSignal): Promise<void> {
+  const response = await fetch(`${RECOMMENDATIONS_API_URL}/views/${eventId}`, {
+    method: "POST",
+    credentials: "include",
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error("Could not record event view");
+  }
+}
+
 export async function fetchRecommendedEvents(signal?: AbortSignal): Promise<Event[]> {
   const response = await fetch(RECOMMENDATIONS_API_URL, {
     credentials: "include",

@@ -11,6 +11,7 @@ import com.eventPlatform.backend.repository.EventRepository;
 import com.eventPlatform.backend.repository.EventVisitRepository;
 import com.eventPlatform.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -49,13 +50,10 @@ public class RecommendationService {
 
         List<Interaction> bookingHistory = bookingInteractions(bookingRepository.findAll());
         List<Interaction> visitHistory = visitInteractions(eventVisitRepository.findAll());
-        boolean hasBookingHistory = bookingHistory.stream().anyMatch(item -> item.userId().equals(userId));
-
-        // If this user has no reservations, learn exclusively from event visits.
-        List<Interaction> trainingData = hasBookingHistory
-                ? mergeInteractions(bookingHistory, visitHistory)
-                : visitHistory;
-        Set<Long> excludedEventIds = consumedEventIds(userId, bookingHistory, visitHistory);
+        List<Interaction> trainingData = mergeInteractions(bookingHistory, visitHistory);
+        boolean hasUserInteractions = trainingData.stream()
+                .anyMatch(item -> item.userId().equals(userId));
+        Set<Long> excludedEventIds = bookedEventIds(userId, bookingHistory);
 
         List<Event> candidates = eventRepository.findAll().stream()
                 .filter(this::isRecommendable)
@@ -65,6 +63,11 @@ public class RecommendationService {
             return List.of();
         }
 
+        Map<Long, Long> popularity = popularity(trainingData);
+        if (!hasUserInteractions) {
+            return coldStartRecommendations(candidates, popularity);
+        }
+
         Map<Long, Integer> userIndexes = indexUsers(trainingData, userId);
         Map<Long, Integer> eventIndexes = indexEvents(trainingData, candidates);
         BiasedMatrixFactorization model = new BiasedMatrixFactorization(
@@ -72,7 +75,6 @@ public class RecommendationService {
                 toIndexedInteractions(trainingData, userIndexes, eventIndexes)
         );
 
-        Map<Long, Long> popularity = popularity(trainingData);
         int currentUserIndex = userIndexes.get(userId);
         return candidates.stream()
                 .map(event -> new ScoredEvent(
@@ -84,6 +86,33 @@ public class RecommendationService {
                         .thenComparing(ScoredEvent::popularity, Comparator.reverseOrder()))
                 .limit(MAX_RECOMMENDATIONS)
                 .map(event -> new RecommendedEventResponse(event.eventId(), event.score()))
+                .toList();
+    }
+
+    @Transactional
+    public void recordView(Long userId, Long eventId) {
+        EventVisit visit = eventVisitRepository.findByAttendeeIdAndEventId(userId, eventId)
+                .orElseGet(EventVisit::new);
+
+        visit.setAttendee(userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found")));
+        visit.setEvent(eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found")));
+        visit.setVisitedAt(LocalDateTime.now());
+
+        eventVisitRepository.save(visit);
+    }
+
+    private List<RecommendedEventResponse> coldStartRecommendations(
+            List<Event> candidates, Map<Long, Long> popularity) {
+        return candidates.stream()
+                .sorted(Comparator
+                        .comparingLong((Event event) -> popularity.getOrDefault(event.getId(), 0L))
+                        .reversed()
+                        .thenComparing(Event::getStartDateTime))
+                .limit(MAX_RECOMMENDATIONS)
+                .map(event -> new RecommendedEventResponse(
+                        event.getId(), popularity.getOrDefault(event.getId(), 0L)))
                 .toList();
     }
 
@@ -103,7 +132,7 @@ public class RecommendationService {
             Long userId = booking.getAttendee().getId();
             Long eventId = booking.getEvent().getId();
             if (userId != null && eventId != null) {
-                interactions.add(new Interaction(userId, eventId, 0.75));
+                interactions.add(new Interaction(userId, eventId, 1.0));
             }
         }
         return interactions;
@@ -113,7 +142,7 @@ public class RecommendationService {
         return visits.stream()
                 .filter(visit -> visit.getAttendee() != null && visit.getEvent() != null)
                 .filter(visit -> visit.getAttendee().getId() != null && visit.getEvent().getId() != null)
-                .map(visit -> new Interaction(visit.getAttendee().getId(), visit.getEvent().getId(), 1.0))
+                .map(visit -> new Interaction(visit.getAttendee().getId(), visit.getEvent().getId(), 0.5))
                 .toList();
     }
 
@@ -130,10 +159,9 @@ public class RecommendationService {
         return new ArrayList<>(byPair.values());
     }
 
-    private Set<Long> consumedEventIds(Long userId, List<Interaction> bookingHistory, List<Interaction> visitHistory) {
+    private Set<Long> bookedEventIds(Long userId, List<Interaction> bookingHistory) {
         Set<Long> eventIds = new HashSet<>();
         bookingHistory.stream().filter(item -> item.userId().equals(userId)).forEach(item -> eventIds.add(item.eventId()));
-        visitHistory.stream().filter(item -> item.userId().equals(userId)).forEach(item -> eventIds.add(item.eventId()));
         return eventIds;
     }
 
