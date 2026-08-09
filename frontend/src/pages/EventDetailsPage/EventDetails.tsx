@@ -1,13 +1,26 @@
+import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../Auth/useAuth";
 import { useFetchEvent } from "../../components/helper";
 import EventMap from "../../OpenStreetMap/loadMap";
+import { recordEventView } from "../HomePage/recommendationApi";
 import DeleteButton from "../OrganiseEvent/DeleteEvent/DeleteButton";
 
 export default function EventDetailsPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const { user } = useAuth();
   const { event, error, isLoading } = useFetchEvent(eventId);
+  const currentUserId = user?.id;
+  const loadedEventId = event?.eventId;
+
+  useEffect(() => {
+    if (!currentUserId || !loadedEventId) return;
+
+    const controller = new AbortController();
+    void recordEventView(loadedEventId, controller.signal).catch(() => undefined);
+
+    return () => controller.abort();
+  }, [currentUserId, loadedEventId]);
 
   if (isLoading) return <main className="page"><p className="page-message">Loading event...</p></main>;
   if (error) return <main className="page"><p className="page-message page-message--error">{error}</p></main>;

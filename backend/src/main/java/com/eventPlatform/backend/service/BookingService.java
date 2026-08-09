@@ -10,6 +10,7 @@ import com.eventPlatform.backend.repository.EventRepository;
 import com.eventPlatform.backend.repository.TicketTypeRepository;
 import com.eventPlatform.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.eventPlatform.backend.enums.BookingStatus;
 import java.time.LocalDateTime;
 
@@ -50,6 +51,7 @@ public class BookingService {
         bookingRepository.deleteById(id);
     }
 
+    @Transactional
     public Booking createBooking(BookingRequest request, Long userId) {
 
         User user = userRepository.findById(userId)
@@ -60,6 +62,19 @@ public class BookingService {
 
         TicketType ticketType = ticketTypeRepository.findById(request.getTicketTypeId())
                 .orElseThrow();
+
+        if (request.getNumberOfTickets() == null || request.getNumberOfTickets() < 1) {
+            throw new IllegalArgumentException("At least one ticket is required");
+        }
+        if (ticketType.getEvent() == null || !event.getId().equals(ticketType.getEvent().getId())) {
+            throw new IllegalArgumentException("Ticket type does not belong to this event");
+        }
+        if (ticketType.getAvailable() == null || ticketType.getAvailable() < request.getNumberOfTickets()) {
+            throw new IllegalArgumentException("Not enough tickets are available");
+        }
+
+        ticketType.setAvailable(ticketType.getAvailable() - request.getNumberOfTickets());
+        ticketTypeRepository.save(ticketType);
 
         Booking booking = new Booking();
 

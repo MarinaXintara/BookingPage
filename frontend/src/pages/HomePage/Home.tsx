@@ -9,6 +9,7 @@ export function Home() {
   const { user } = useAuth();
   const [recommendations, setRecommendations] = useState<Event[]>([]);
   const [recommendationsError, setRecommendationsError] = useState(false);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
@@ -19,6 +20,11 @@ export function Home() {
       .catch((error: unknown) => {
         if (!(error instanceof DOMException && error.name === "AbortError")) {
           setRecommendationsError(true);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setRecommendationsLoading(false);
         }
       });
 
@@ -47,14 +53,16 @@ export function Home() {
 
       <section className="recommendations" aria-labelledby="recommendations-title">
         <h2 id="recommendations-title">Recommended for you</h2>
-        {recommendations.length > 0 ? (
+        {recommendationsLoading ? (
+          <p className="muted" aria-live="polite">Loading recommendations...</p>
+        ) : recommendationsError ? (
+          <p className="muted" role="alert">Recommendations are not available right now. You can still browse all events.</p>
+        ) : recommendations.length > 0 ? (
           <div className="event-grid">
             {recommendations.map((event) => (
               <EventGridCard key={event.eventId} event={event} />
             ))}
           </div>
-        ) : recommendationsError ? (
-          <p className="muted">Recommendations are not available right now.</p>
         ) : (
           <p className="muted">No personalised recommendations are available yet.</p>
         )}

@@ -11,7 +11,7 @@ import jakarta.persistence.UniqueConstraint;
 
 import java.time.LocalDateTime;
 
-/** A check-in records that an attendee actually visited an event. */
+/** Records that an authenticated attendee viewed an event. */
 @Entity
 @Table(name = "event_visits", uniqueConstraints = @UniqueConstraint(columnNames = {"attendee_id", "event_id"}))
 public class EventVisit {
