@@ -1,8 +1,29 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../Auth/useAuth.ts";
+import EventGridCard from "../EventPage/EventGridCard.tsx";
+import type { Event } from "../EventPage/eventApi.ts";
+import { fetchRecommendedEvents } from "./recommendationApi.ts";
 
 export function Home() {
   const { user } = useAuth();
+  const [recommendations, setRecommendations] = useState<Event[]>([]);
+  const [recommendationsError, setRecommendationsError] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const controller = new AbortController();
+    fetchRecommendedEvents(controller.signal)
+      .then(setRecommendations)
+      .catch((error: unknown) => {
+        if (!(error instanceof DOMException && error.name === "AbortError")) {
+          setRecommendationsError(true);
+        }
+      });
+
+    return () => controller.abort();
+  }, [user]);
 
   return (
     <main className="page page--narrow">
@@ -22,6 +43,21 @@ export function Home() {
             My bookings
           </Link>
         </div>
+      </section>
+
+      <section className="recommendations" aria-labelledby="recommendations-title">
+        <h2 id="recommendations-title">Recommended for you</h2>
+        {recommendations.length > 0 ? (
+          <div className="event-grid">
+            {recommendations.map((event) => (
+              <EventGridCard key={event.eventId} event={event} />
+            ))}
+          </div>
+        ) : recommendationsError ? (
+          <p className="muted">Recommendations are not available right now.</p>
+        ) : (
+          <p className="muted">No personalised recommendations are available yet.</p>
+        )}
       </section>
     </main>
   );
