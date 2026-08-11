@@ -15,7 +15,7 @@ export interface Event {
   status?: string;
   description?: string;
   organizer?:  {firstName: string; lastName:string; id:number;}
-  media?: Media[];
+  media: Media[];
 
 }
 
@@ -30,7 +30,8 @@ interface TicketType {
 
 
 interface Media{
-  photoUrl: string;
+  id:number;
+  imageUrl: string;
 }
 
 interface BackendEvent {
@@ -55,6 +56,7 @@ interface BackendEvent {
     id?: number;
   } | null;
   ticketTypes?: TicketType[];
+  media:Media[]
 }
 
 const API_URL = 'http://localhost:8080/api/events';
@@ -86,6 +88,7 @@ function toEvent(event: BackendEvent): Event {
       lastName:event.organizer?.lastName as string,
       id:event.organizer?.id as number} : undefined ,
     ticketTypes: event.ticketTypes ?? [],
+    media:event.media
   };
 }
 

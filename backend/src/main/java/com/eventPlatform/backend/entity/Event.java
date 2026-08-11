@@ -46,6 +46,10 @@ public class Event {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings = new ArrayList<>();
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Media> media = new ArrayList<>();
+
 
     public Event() {}
 
@@ -101,4 +105,11 @@ public class Event {
 
     public List<Booking> getBookings() { return bookings; }
     public void setBookings(List<Booking> bookings) { this.bookings = bookings; }
+
+    public List<Media> getMedia() { return media; }
+    public void setMedia(List<Media> media) { this.media = media; }
+    public void addMedia(Media media) {
+    media.setEvent(this);
+    this.media.add(media);
+}
 }
