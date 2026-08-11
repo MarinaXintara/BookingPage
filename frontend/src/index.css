@@ -507,17 +507,41 @@ legend {
   gap: 1rem;
 }
 
+
 .event-card {
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-height: 320px;
+  box-sizing: border-box;
+
   padding: 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
+
   background: var(--surface);
   color: var(--text);
   text-decoration: none;
+
+  overflow: visible;
 }
 
+.event-card .event-images {
+  width: 100%;
+  margin: 0.75rem 0;
+}
+
+.event-card .event-cover {
+  width: 100%;
+  height: 150px;
+
+  object-fit: contain;
+  display: block;
+
+  border-radius: 8px;
+}
 .event-card:hover {
   border-color: var(--primary);
 }
@@ -558,6 +582,21 @@ legend {
   display: grid;
   gap: 1.25rem;
 }
+.event-images {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.event-cover {
+  width: 100% !important;
+  max-width: 700px !important;
+  height: 400px !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: var(--radius);
+}
+
 
 .ticket-list {
   margin: 0;
@@ -708,6 +747,7 @@ legend {
   min-height: 140px;
   white-space: pre-wrap;
 }
+
 
 @media (max-width: 720px) {
   .page-header,

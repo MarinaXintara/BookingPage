@@ -51,6 +51,18 @@ export default function EventDetailsPage() {
       </header>
 
       <article className="panel event-details">
+        {event.media?.length > 0 ? (
+          <section className="event-images">
+            {event.media.map((media) => (
+              <img
+                key={media.id}
+                src={`http://localhost:8080${media.imageUrl}`}
+                alt={event.title}
+                className="event-cover"
+              />
+            ))}
+          </section>
+        ) : null}
         <dl className="details-list">
           <div><dt>Organizer</dt><dd>{organizerFullName ?? "Not specified"}</dd></div>
           {event.venue ? <div><dt>Venue</dt><dd>{event.venue}</dd></div> : null}

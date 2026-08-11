@@ -1,11 +1,16 @@
 package com.eventPlatform.backend.controller;
 
 import com.eventPlatform.backend.entity.Event;
-import com.eventPlatform.backend.entity.User;
+import com.eventPlatform.backend.entity.Media;
 import com.eventPlatform.backend.service.EventService;
+import com.eventPlatform.backend.service.FileStorageService;
+
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -13,9 +18,14 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final FileStorageService fileStorageService;
 
-    public EventController(EventService eventService) {
+    public EventController(
+            EventService eventService,
+            FileStorageService fileStorageService) {
+
         this.eventService = eventService;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping
@@ -30,17 +40,68 @@ public class EventController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/createEvent")
-    public Event createEvent(@RequestBody Event event) {
+
+    // =========================
+    // CREATE EVENT
+    // =========================
+
+    @PostMapping(
+            value = "/createEvent",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public Event createEvent(
+            @RequestPart("event") Event event,
+            @RequestPart(value = "files", required = false)   //add multiple files
+            List<MultipartFile> files
+    ) throws IOException {
+
+        if (files != null) {
+
+            for (MultipartFile file : files) {
+
+                if (!file.isEmpty()) {
+
+                    String imageUrl =
+                            fileStorageService.store(file);
+
+                    Media media = new Media();
+
+                    media.setImageUrl(imageUrl);
+                    media.setEvent(event);
+
+                    event.getMedia().add(media);
+                }
+            }
+        }
+
         return eventService.saveEvent(event);
     }
 
-    @PatchMapping("/editEvent")
-    public Event editEvent(@RequestBody Event event) {
+
+    // =========================
+    // EDIT EVENT
+    // =========================
+
+    @PatchMapping(
+            value = "/editEvent",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public Event editEvent(
+            @RequestPart("event") Event event,
+            @RequestPart(value = "files", required = false)
+            List<MultipartFile> files
+    ) throws IOException {
+
         Event temp = eventService.findById(event.getId());
+
         if (temp == null) {
             throw new RuntimeException("Event not found");
         }
+
+
+        // -------------------------
+        // Existing edit logic
+        // -------------------------
 
         if (event.getTitle() != null) {
             temp.setTitle(event.getTitle());
@@ -102,22 +163,58 @@ public class EventController {
             temp.setOrganizer(event.getOrganizer());
         }
 
-        if (event.getTicketTypes() != null && !event.getTicketTypes().isEmpty()) {
+        if (event.getTicketTypes() != null &&
+                !event.getTicketTypes().isEmpty()) {
+
             temp.setTicketTypes(event.getTicketTypes());
         }
 
-        if (event.getBookings() != null && !event.getBookings().isEmpty()) {
+        if (event.getBookings() != null &&
+                !event.getBookings().isEmpty()) {
+
             temp.setBookings(event.getBookings());
+        }
+
+
+        // -------------------------
+        // New images
+        // -------------------------
+
+        if (files != null && !files.isEmpty()) {
+
+            for (MultipartFile file : files) {
+
+                if (!file.isEmpty()) {
+
+                    String imageUrl =
+                            fileStorageService.store(file);
+
+                    Media media = new Media();
+
+                    media.setImageUrl(imageUrl);
+                    media.setEvent(temp);
+
+                    temp.getMedia().add(media);
+                }
+            }
         }
 
         return eventService.saveEvent(temp);
     }
 
+
+    // =========================
+    // DELETE EVENT
+    // =========================
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
+
         eventService.deleteEvent(id);
+
         return ResponseEntity.noContent().build();
     }
-
-
 }
+   
+
+    
