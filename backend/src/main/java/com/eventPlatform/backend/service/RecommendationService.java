@@ -267,4 +267,9 @@ public class RecommendationService {
             return prediction;
         }
     }
+
+
+    public void deleteEventRecommendations(Long id) {
+        eventVisitRepository.deleteByEventId(id);
+    }
 }
