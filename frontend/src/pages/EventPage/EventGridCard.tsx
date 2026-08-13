@@ -11,6 +11,17 @@ export default function EventGridCard({ event }: { event: Event }) {
   return (
     <Link className="event-card" to={`/events/${event.eventId}`}>
       <h2>{event.title}</h2>
+      {event.media?.length > 0 ? (
+          <section className="event-images">
+            {event.media.map((media) => (
+              <img
+                key={media.id}
+                src={`http://localhost:8080${media.imageUrl}`}
+                alt={event.title}
+                className="event-cover"
+              />
+            ))}
+            </section>):null}
       {location ? <p>{location}</p> : null}
       {eventType ? <p className="event-card__type">{eventType}</p> : null}
       <time dateTime={event.startDateTime}>

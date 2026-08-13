@@ -40,7 +40,6 @@ export default function CreateEvent() {
   const [ticketTypes, setTicketTypes] =
     useState<TicketDraft[]>(() => [createTicketDraft()]);
 
-  // Πολλές εικόνες
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   function addTicketType() {
@@ -128,10 +127,10 @@ export default function CreateEvent() {
     try {
       setSubmittingStatus(status);
 
-      // Δημιουργία multipart/form-data
+      
       const formData = new FormData();
 
-      // Το Event σαν JSON
+      
       formData.append(
         "event",
         new Blob(
@@ -142,7 +141,7 @@ export default function CreateEvent() {
         )
       );
 
-      // Όλες οι εικόνες
+      
       selectedFiles.forEach((file) => {
         formData.append("files", file);
       });
