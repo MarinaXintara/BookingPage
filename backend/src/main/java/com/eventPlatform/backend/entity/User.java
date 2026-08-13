@@ -18,7 +18,8 @@ public class User {
     private String phoneNumber;
     private String address;
     private String tin;
-    private String role= "USER";// //make this enum
+    private String status = "PENDING"; //make this enum
+    private String role= "USER"; //make this enum
 
     // Constructors
     public User() {}
@@ -33,6 +34,7 @@ public class User {
         this.address = address;
         this.tin = tin;
         this.role = "USER";
+        this.status = "PENDING";
     }
 
     // Getters & Setters
@@ -103,5 +105,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
