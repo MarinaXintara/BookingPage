@@ -53,7 +53,8 @@ export default function EditEvent() {
           endDateTime: toDateTimeInput(data.endDateTime),
           capacity: String(data.capacity ?? 1),
           description: data.description ?? "",
-            media: data.media ?? "",
+          
+         
         });
         setStatus((data.status as EventStatus | undefined) ?? "DRAFT");
       })
