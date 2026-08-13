@@ -159,5 +159,28 @@ public class AuthController {
         return "User Role Changed";
     }
 
+    @PostMapping("/changeRole/{id}")
+    public String changeRole(@PathVariable Long id, Authentication authentication) {
+        if(authentication == null || !authentication.isAuthenticated()){
+            throw new RuntimeException("Not logged in");
+        }
 
+        Long userId = Long.parseLong(authentication.getName());
+        User currUser = userService.findById(userId);
+        if(currUser == null){
+            throw new RuntimeException("User not found");
+        }
+        if(!"ADMIN".equals(currUser.getRole())){
+            throw new RuntimeException("Not Admin");
+        }
+
+        User user = userService.findById(id);
+        if(user == null){
+            throw new RuntimeException("User not found");
+        }
+        if(user.getStatus().equals("PENDING")){
+            user.setStatus("APPROVED");
+        }
+        return "User Approved";
+    }
 }
