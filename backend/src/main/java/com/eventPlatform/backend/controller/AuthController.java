@@ -75,7 +75,7 @@ public class AuthController {
         if(user == null){
             throw new RuntimeException("User not found");
         }
-        return new UserResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole());
+        return new UserResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole(), user.getStatus());
     }
 
     @PostMapping("/logout")
@@ -115,7 +115,7 @@ public class AuthController {
         List<UserResponse> userResponses = new ArrayList<>();
 
         for(User u : allUsers) {
-            userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getRole()));
+            userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getRole(), u.getStatus()));
         }
         return userResponses;
     }
@@ -127,7 +127,7 @@ public class AuthController {
             throw new RuntimeException("User not found");
         }
 
-        return new UserResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole());
+        return new UserResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole(),user.getStatus());
     }
 
     @PostMapping("/changeRole/{id}")
@@ -159,8 +159,8 @@ public class AuthController {
         return "User Role Changed";
     }
 
-    @PostMapping("/changeRole/{id}")
-    public String changeRole(@PathVariable Long id, Authentication authentication) {
+    @PostMapping("/approveStatus/{id}")
+    public String approveStatus(@PathVariable Long id, Authentication authentication) {
         if(authentication == null || !authentication.isAuthenticated()){
             throw new RuntimeException("Not logged in");
         }
@@ -180,7 +180,34 @@ public class AuthController {
         }
         if(user.getStatus().equals("PENDING")){
             user.setStatus("APPROVED");
+            userService.saveUser(user);
         }
         return "User Approved";
+    }
+
+    @PostMapping("/rejectStatus/{id}")
+    public String rejectStatus(@PathVariable Long id, Authentication authentication) {
+        if(authentication == null || !authentication.isAuthenticated()){
+            throw new RuntimeException("Not logged in");
+        }
+
+        Long userId = Long.parseLong(authentication.getName());
+        User currUser = userService.findById(userId);
+        if(currUser == null){
+            throw new RuntimeException("User not found");
+        }
+        if(!"ADMIN".equals(currUser.getRole())){
+            throw new RuntimeException("Not Admin");
+        }
+
+        User user = userService.findById(id);
+        if(user == null){
+            throw new RuntimeException("User not found");
+        }
+        if(user.getStatus().equals("PENDING")){
+            user.setStatus("REJECTED");
+            userService.saveUser(user);
+        }
+        return "User Rejected";
     }
 }

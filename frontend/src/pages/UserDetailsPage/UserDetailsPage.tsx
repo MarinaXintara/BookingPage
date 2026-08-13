@@ -2,22 +2,22 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Button from "../../components/Button";
 import { fetchUser, type User } from "../UsersPage/userApi";
-import {
-  type AccountStatus,
-  formatRegistrationDate,
-  getRoleLabel,
-  getStatusLabel,
-  getUserMetadata,
-  updateDemoUserStatus,
-} from "../UsersPage/userPresentation";
+import{getRoleLabel} from "../UsersPage/userPresentation";
+// import {
+//   type AccountStatus,
+//   formatRegistrationDate,
+//   getRoleLabel,
+//   getStatusLabel,
+//   getUserMetadata,
+//   updateDemoUserStatus,
+// } from "../UsersPage/userPresentation";
 
 export default function UserDetailsPage() {
   const { userId } = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(Boolean(userId));
   const [error, setError] = useState(userId ? "" : "Missing user id.");
-  const [status, setStatus] = useState<AccountStatus | null>(null);
-  const [registeredAt, setRegisteredAt] = useState<string | null>(null);
+  const [status, setStatus] = useState<User | null>(null);
   const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
@@ -27,10 +27,9 @@ export default function UserDetailsPage() {
     fetchUser(userId)
       .then((result) => {
         if (!ignore) {
-          const metadata = getUserMetadata(result.id);
+          
           setUser(result);
-          setStatus(metadata.status);
-          setRegisteredAt(metadata.registeredAt);
+         
         }
       })
       .catch(() => {
@@ -42,13 +41,109 @@ export default function UserDetailsPage() {
     return () => { ignore = true; };
   }, [userId]);
 
-  function changeStatus(nextStatus: AccountStatus) {
-    if (!user) return;
+  async function handleApprove() {
+  if (!userId) return;
 
-    updateDemoUserStatus(user.id, nextStatus);
-    setStatus(nextStatus);
-    setStatusMessage("Status updated for this demo. It will reset when the page is reloaded.");
+  try {
+    setStatusMessage("");
+
+    const response = await fetch(
+      `http://localhost:8080/api/auth/approveStatus/${userId}`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Could not approve user.");
+    }
+
+    setUser((current) =>
+      current
+        ? { ...current, status: "APPROVED" }
+        : current
+    );
+
+    setStatusMessage("User approved successfully.");
+  } catch (error) {
+    setStatusMessage(
+      error instanceof Error
+        ? error.message
+        : "Could not approve user."
+    );
   }
+}
+
+async function handleReject() {
+  if (!userId) return;
+
+  try {
+    setStatusMessage("");
+
+    const response = await fetch(
+      `http://localhost:8080/api/auth/rejectStatus/${userId}`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Could not reject user.");
+    }
+
+    setUser((current) =>
+      current
+        ? { ...current, status: "REJECTED" }
+        : current
+    );
+
+    setStatusMessage("User rejected successfully.");
+  } catch (error) {
+    setStatusMessage(
+      error instanceof Error
+        ? error.message
+        : "Could not reject user."
+    );
+  }
+}
+
+async function handleAdmin() {
+  if (!userId) return;
+
+  try {
+    setStatusMessage("");
+
+    const response = await fetch(
+      `http://localhost:8080/api/auth/changeRole/${userId}`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Could not reject user.");
+    }
+
+    setUser((current) =>
+      current
+        ? { ...current, role: "ADMIN" }
+        : current
+    );
+
+    setStatusMessage("User  change successfully.");
+  } catch (error) {
+    setStatusMessage(
+      error instanceof Error
+        ? error.message
+        : "Could not change user role."
+    );
+  }
+}
+
+  
 
   return (
     <main className="page page--narrow">
@@ -61,20 +156,23 @@ export default function UserDetailsPage() {
           <header className="page-header">
             <div>
               <h1>{user.firstName} {user.lastName}</h1>
-              <p>{getRoleLabel(user.role)}</p>
+              <p>{(user.role)}</p>
             </div>
           </header>
           <dl className="details-list">
             <div><dt>Email</dt><dd><a href={`mailto:${user.email}`}>{user.email}</a></dd></div>
             <div><dt>Phone</dt><dd>{user.phoneNumber ?? "Not provided"}</dd></div>
-            <div><dt>Status</dt><dd>{status ? <span className={`status-badge status-badge--${status.toLowerCase()}`}>{getStatusLabel(status)}</span> : "Not available"}</dd></div>
-            <div><dt>Registered</dt><dd>{formatRegistrationDate(registeredAt)}</dd></div>
+            {/* <div><dt>Status</dt><dd>{status ? <span className={`status-badge status-badge--${status.toLowerCase()}`}>{getStatusLabel(user.status)}</span> : "Not available"}</dd></div> */}
+           <div><dt>Status</dt><dd>{user.status}</dd></div>
           </dl>
           <div className="page-actions">
-            <Button disabled={status === "APPROVED"} onClick={() => changeStatus("APPROVED")}>Approve</Button>
-            <Button variant="danger" disabled={status === "REJECTED"} onClick={() => changeStatus("REJECTED")}>Reject</Button>
+            <Button disabled={user.status === "APPROVED" || user.status==="REJECTED"} onClick={handleApprove}>Approve</Button>
+            <Button variant="danger" disabled={user.status === "APPROVED" || user.status === "REJECTED"} onClick={handleReject}>Reject</Button>
+            <Button disabled={user.role==="ADMIN"} onClick={handleAdmin}>Set as admin</Button>
+            {/* <Button disabled={user.role==="ORGANISER"} onClick={}>Set as organiser</Button> */}
           </div>
-          {statusMessage ? <p className="mock-data-note" role="status">{statusMessage}</p> : null}
+         
+          {statusMessage ? <p className="mock-data-note" role="status">{user.status}</p> : null}
         </article>
       ) : null}
     </main>
