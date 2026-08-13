@@ -25,6 +25,7 @@ export default function EditEvent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [eventData, setEventData] = useState<EventFormData>(() => ({ ...emptyEventFormData }));
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [status, setStatus] = useState<EventStatus>("DRAFT");
 
   useEffect(() => {
@@ -80,18 +81,28 @@ export default function EditEvent() {
     setIsSubmitting(true);
 
     try {
+
+      const formData = new FormData();
+      formData.append(
+        "event",
+        new Blob(
+          [JSON.stringify(eventData)],
+          {
+            type: "application/json",
+          }
+        )
+      );
+
+      selectedFiles.forEach((file) => {
+        formData.append("files", file);
+      });
       const response = await fetch("http://localhost:8080/api/events/editEvent", {
         method: "PATCH",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: Number(eventId),
-          ...eventData,
-          capacity: Number(eventData.capacity),
-          status,
-        }),
+        body: formData
       });
-      if (!response.ok) throw new Error("Failed to update event.");
+    
+    if (!response.ok) throw new Error("Failed to update event.");
       setFeedback({ text: "Event updated successfully.", type: "success" });
     } catch (error) {
       setFeedback({
@@ -118,6 +129,23 @@ export default function EditEvent() {
             <option value="COMPLETED">Completed</option>
             <option value="CANCELLED">Cancelled</option>
           </select>
+        </div>
+        <div className="form-field">
+          <label htmlFor="edit-images">Event images</label>
+
+          <input
+            id="edit-images"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            multiple
+            onChange={(event) =>
+              setSelectedFiles(
+                event.target.files
+                  ? Array.from(event.target.files)
+                  : []
+              )
+            }
+          />
         </div>
         {feedback ? <p className={`page-message page-message--${feedback.type}`} role="status">{feedback.text}</p> : null}
         <div className="page-actions"><Link className="button button--secondary" to={`/events/${eventId}`}>Cancel</Link><Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving..." : "Save changes"}</Button></div>
