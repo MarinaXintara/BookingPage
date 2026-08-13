@@ -5,6 +5,8 @@ import com.eventPlatform.backend.entity.Media;
 import com.eventPlatform.backend.service.EventService;
 import com.eventPlatform.backend.service.FileStorageService;
 
+import com.eventPlatform.backend.service.RecommendationService;
+import jakarta.transaction.Transactional;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,14 +20,17 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final RecommendationService recommendationService;
     private final FileStorageService fileStorageService;
 
     public EventController(
             EventService eventService,
-            FileStorageService fileStorageService) {
+            FileStorageService fileStorageService,
+        RecommendationService recommendationService) {
 
         this.eventService = eventService;
         this.fileStorageService = fileStorageService;
+        this.recommendationService = recommendationService;
     }
 
     @GetMapping
@@ -41,14 +46,7 @@ public class EventController {
     }
 
 
-    // =========================
-    // CREATE EVENT
-    // =========================
-
-    @PostMapping(
-            value = "/createEvent",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
+    @PostMapping(value = "/createEvent", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Event createEvent(
             @RequestPart("event") Event event,
             @RequestPart(value = "files", required = false)   //add multiple files
@@ -77,11 +75,6 @@ public class EventController {
         return eventService.saveEvent(event);
     }
 
-
-    // =========================
-    // EDIT EVENT
-    // =========================
-
     @PatchMapping(
             value = "/editEvent",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -97,11 +90,6 @@ public class EventController {
         if (temp == null) {
             throw new RuntimeException("Event not found");
         }
-
-
-        // -------------------------
-        // Existing edit logic
-        // -------------------------
 
         if (event.getTitle() != null) {
             temp.setTitle(event.getTitle());
@@ -175,11 +163,6 @@ public class EventController {
             temp.setBookings(event.getBookings());
         }
 
-
-        // -------------------------
-        // New images
-        // -------------------------
-
         if (files != null && !files.isEmpty()) {
 
             for (MultipartFile file : files) {
@@ -202,14 +185,11 @@ public class EventController {
         return eventService.saveEvent(temp);
     }
 
-
-    // =========================
-    // DELETE EVENT
-    // =========================
-
     @DeleteMapping("/{id}")
+    @Transactional
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
 
+        recommendationService.deleteEventRecommendations(id);
         eventService.deleteEvent(id);
 
         return ResponseEntity.noContent().build();

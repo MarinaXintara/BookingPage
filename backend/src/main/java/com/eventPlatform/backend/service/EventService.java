@@ -3,6 +3,7 @@ package com.eventPlatform.backend.service;
 import com.eventPlatform.backend.entity.Event;
 import com.eventPlatform.backend.entity.TicketType;
 import com.eventPlatform.backend.repository.EventRepository;
+import com.eventPlatform.backend.repository.EventVisitRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public class EventService {
 
     private final EventRepository eventRepository;
 
-    public EventService(EventRepository eventRepository) {
+    public EventService(EventRepository eventRepository, EventVisitRepository eventVisitRepository) {
         this.eventRepository = eventRepository;
     }
 
@@ -45,6 +46,7 @@ public class EventService {
 
         return eventRepository.save(event);
     }
+
 
     public void deleteEvent(Long id) {
         eventRepository.deleteById(id);

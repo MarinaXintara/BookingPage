@@ -109,7 +109,7 @@ public class Event {
     public List<Media> getMedia() { return media; }
     public void setMedia(List<Media> media) { this.media = media; }
     public void addMedia(Media media) {
-    media.setEvent(this);
-    this.media.add(media);
-}
+        media.setEvent(this);
+        this.media.add(media);
+    }
 }
