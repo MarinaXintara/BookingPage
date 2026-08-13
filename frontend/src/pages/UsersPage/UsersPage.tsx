@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchUsers, type User } from "./userApi";
 import {
-  formatRegistrationDate,
+
   getRoleLabel,
   getStatusLabel,
   getUserMetadata,
@@ -110,15 +110,14 @@ export default function UsersPage() {
                 </thead>
                 <tbody>
                   {visibleUsers.map((user) => {
-                    const metadata = getUserMetadata(user.id);
-
+                    
                     return (
                       <tr key={user.id}>
                         <th scope="row"><Link to={`/users/${user.id}`}>{user.firstName} {user.lastName}</Link></th>
                         <td><a href={`mailto:${user.email}`}>{user.email}</a></td>
                         <td>{getRoleLabel(user.role)}</td>
-                        <td><span className={`status-badge status-badge--${metadata.status.toLowerCase()}`}>{getStatusLabel(metadata.status)}</span></td>
-                        <td>{formatRegistrationDate(metadata.registeredAt)}</td>
+                        <td>{user.status}</td>
+                        
                       </tr>
                     );
                   })}

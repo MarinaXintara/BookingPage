@@ -35,7 +35,7 @@ export function updateDemoUserStatus(userId: number, status: AccountStatus) {
 export function getRoleLabel(role?: string | null) {
   if (role === "ADMIN") return "Administrator";
   if (role === "ORGANIZER") return "Organizer";
-  return "Attendee";
+  return "User";
 }
 
 export function getStatusLabel(status: AccountStatus) {

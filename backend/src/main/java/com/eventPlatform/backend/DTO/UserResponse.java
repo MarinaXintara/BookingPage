@@ -9,16 +9,18 @@ public class UserResponse {
     private String lastName;
     private String email;
     private String role; //make this enum
+    private String status; //make this enum
 
     // Constructors
     public UserResponse() {}
 
-    public UserResponse(Long id,String firstName, String lastName, String email,String role) {
+    public UserResponse(Long id,String firstName, String lastName, String email,String role, String status) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.role = role;
+        this.status = status;
     }
 
     // Getters & Setters
@@ -57,5 +59,13 @@ public class UserResponse {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
