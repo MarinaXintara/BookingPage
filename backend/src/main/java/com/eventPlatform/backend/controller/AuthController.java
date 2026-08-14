@@ -5,6 +5,7 @@ import com.eventPlatform.backend.DTO.UserResponse;
 import com.eventPlatform.backend.entity.User;
 import com.eventPlatform.backend.jwt.JwtService;
 import com.eventPlatform.backend.service.UserService;
+import com.eventPlatform.backend.DTO.UpdateProfileRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -75,7 +76,7 @@ public class AuthController {
         if(user == null){
             throw new RuntimeException("User not found");
         }
-        return new UserResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole(), user.getStatus());
+        return new UserResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),user.getPhoneNumber(),user.getAddress(), user.getRole(), user.getStatus());
     }
 
     @PostMapping("/logout")
@@ -115,7 +116,7 @@ public class AuthController {
         List<UserResponse> userResponses = new ArrayList<>();
 
         for(User u : allUsers) {
-            userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getRole(), u.getStatus()));
+            userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),u.getPhoneNumber(),u.getAddress(), u.getRole(), u.getStatus()));
         }
         return userResponses;
     }
@@ -127,7 +128,7 @@ public class AuthController {
             throw new RuntimeException("User not found");
         }
 
-        return new UserResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole(),user.getStatus());
+        return new UserResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),user.getPhoneNumber(),user.getAddress(), user.getRole(),user.getStatus());
     }
 
     @PostMapping("/changeRole/{id}")
@@ -209,5 +210,33 @@ public class AuthController {
             userService.saveUser(user);
         }
         return "User Rejected";
+    }
+    @PutMapping("/profile")
+    public UserResponse updateProfile(@RequestBody UpdateProfileRequest request,Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+
+        User user = userService.findById(userId);
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setAddress(request.getAddress());
+
+        User updatedUser = userService.save(user);
+
+        return new UserResponse(
+            updatedUser.getId(),
+            updatedUser.getFirstName(),
+            updatedUser.getLastName(),
+            updatedUser.getEmail(),
+            updatedUser.getRole(),
+            updatedUser.getStatus(),
+            updatedUser.getPhoneNumber(),
+            updatedUser.getAddress()
+        );
     }
 }
