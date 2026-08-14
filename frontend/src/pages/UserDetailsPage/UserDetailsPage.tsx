@@ -153,7 +153,7 @@ async function handleOrganiser() {
           headers: {
             "Content-Type": "text/plain",
           },
-          body: "ORGANISER",
+          body: "ORGANIZER",
         }
       );
    
@@ -164,7 +164,7 @@ async function handleOrganiser() {
 
     setUser((current) =>
       current
-        ? { ...current, role: "ORGANISER" }
+        ? { ...current, role: "ORGANIZER" }
         : current
     );
 
@@ -202,8 +202,8 @@ return (
         <div className="page-actions">
           <Button disabled={user.status === "APPROVED" || user.status === "REJECTED"} onClick={handleApprove}>Approve</Button>
           <Button variant="danger" disabled={user.status === "APPROVED" || user.status === "REJECTED"} onClick={handleReject}>Reject</Button>
-          <Button disabled={user.role === "ADMIN" ||user.role==="ORGANISER"} onClick={handleAdmin}>Set as admin</Button>
-          <Button disabled={user.role==="ORGANISER"|| user.role==="ADMIN"} onClick={handleOrganiser}>Set as organiser</Button> 
+          <Button disabled={user.role === "ADMIN" ||user.role==="ORGANIZER"} onClick={handleAdmin}>Set as admin</Button>
+          <Button disabled={user.role==="ORGANIZER"|| user.role==="ADMIN"} onClick={handleOrganiser}>Set as organizer</Button>
         </div>
 
         {statusMessage ? <p className="mock-data-note" role="status">{user.status}</p> : null}
