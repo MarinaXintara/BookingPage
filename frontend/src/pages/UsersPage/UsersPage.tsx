@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchUsers, type User } from "./userApi";
-import {
-
-  getRoleLabel,
-  getStatusLabel,
-  getUserMetadata,
-} from "./userPresentation";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -37,14 +31,13 @@ export default function UsersPage() {
 
     return users.filter((user) => {
       const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-      const metadata = getUserMetadata(user.id);
       const matchesSearch =
         !searchValue ||
         fullName.includes(searchValue) ||
         user.email.toLowerCase().includes(searchValue);
       const matchesRole = roleFilter === "ALL" || user.role === roleFilter;
       const matchesStatus =
-        statusFilter === "ALL" || metadata.status === statusFilter;
+        statusFilter === "ALL" || user.status === statusFilter;
 
       return matchesSearch && matchesRole && matchesStatus;
     });
@@ -115,7 +108,7 @@ export default function UsersPage() {
                       <tr key={user.id}>
                         <th scope="row"><Link to={`/users/${user.id}`}>{user.firstName} {user.lastName}</Link></th>
                         <td><a href={`mailto:${user.email}`}>{user.email}</a></td>
-                        <td>{getRoleLabel(user.role)}</td>
+                        <td>{user.role}</td>
                         <td>{user.status}</td>
                         
                       </tr>
