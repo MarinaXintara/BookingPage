@@ -165,15 +165,22 @@ public class EventController {
 
         if (files != null && !files.isEmpty()) {
 
+            // Delete old image files from disk
+            for (Media oldMedia : temp.getMedia()) {
+                fileStorageService.delete(oldMedia.getImageUrl());
+            }
+
+            // Remove old Media entities
+            temp.getMedia().clear();
+
+            // Store new images
             for (MultipartFile file : files) {
 
                 if (!file.isEmpty()) {
 
-                    String imageUrl =
-                            fileStorageService.store(file);
+                    String imageUrl = fileStorageService.store(file);
 
                     Media media = new Media();
-
                     media.setImageUrl(imageUrl);
                     media.setEvent(temp);
 
@@ -181,9 +188,9 @@ public class EventController {
                 }
             }
         }
-
-        return eventService.saveEvent(temp);
+          return eventService.saveEvent(temp);
     }
+   
 
     @DeleteMapping("/{id}")
     @Transactional
