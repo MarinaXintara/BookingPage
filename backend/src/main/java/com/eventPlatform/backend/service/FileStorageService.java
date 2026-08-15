@@ -40,4 +40,25 @@ public class FileStorageService {
 
         return "/uploads/events/" + filename;
     }
+
+    public void delete(String imageUrl) throws IOException {
+
+        if (imageUrl == null || imageUrl.isBlank()) {
+            return;
+        }
+
+        String filename = Paths.get(imageUrl)
+                .getFileName()
+                .toString();
+
+        Path file = directory
+                .resolve(filename)
+                .normalize();
+
+        if (!file.startsWith(directory)) {
+            throw new IllegalArgumentException("Invalid filename");
+        }
+
+        Files.deleteIfExists(file);
+    }
 }
