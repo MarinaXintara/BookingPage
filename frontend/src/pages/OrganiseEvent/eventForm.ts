@@ -1,3 +1,8 @@
+export interface EventMedia {
+  id: number;
+  imageUrl: string;
+}
+
 export interface EventFormData {
   title: string;
   category: string;
@@ -12,6 +17,7 @@ export interface EventFormData {
   endDateTime: string;
   capacity: string;
   description: string;
+  media:EventMedia[];
 }
 
 export type EventStatus = "DRAFT" | "PUBLISHED" | "COMPLETED" | "CANCELLED";
@@ -30,6 +36,7 @@ export const emptyEventFormData: EventFormData = {
   endDateTime: "",
   capacity: "1",
   description: "",
+  media: []
 };
 
 export function getScheduleError(startDateTime: string, endDateTime: string) {

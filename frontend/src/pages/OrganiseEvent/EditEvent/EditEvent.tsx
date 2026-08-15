@@ -53,8 +53,9 @@ export default function EditEvent() {
           endDateTime: toDateTimeInput(data.endDateTime),
           capacity: String(data.capacity ?? 1),
           description: data.description ?? "",
-          
-         
+          media: data.media ?? []
+
+
         });
         setStatus((data.status as EventStatus | undefined) ?? "DRAFT");
       })
@@ -85,10 +86,16 @@ export default function EditEvent() {
     try {
 
       const formData = new FormData();
+      const eventToUpdate = {
+        id: Number(eventId),
+        ...eventData,
+        status,
+      };
+
       formData.append(
         "event",
         new Blob(
-          [JSON.stringify(eventData)],
+          [JSON.stringify(eventToUpdate)],
           {
             type: "application/json",
           }
@@ -103,8 +110,8 @@ export default function EditEvent() {
         credentials: "include",
         body: formData
       });
-    
-    if (!response.ok) throw new Error("Failed to update event.");
+
+      if (!response.ok) throw new Error("Failed to update event.");
       setFeedback({ text: "Event updated successfully.", type: "success" });
     } catch (error) {
       setFeedback({
