@@ -3,11 +3,17 @@ import {
   Map as LeafletMap,
   type LeafletMouseEvent,
   Marker,
+  Icon,
   map,
   marker,
   tileLayer,
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
+
+import markerIconUrl from "../../../node_modules/leaflet/dist/images/marker-icon.png";
+import markerIconRetinaUrl from "../../../node_modules/leaflet/dist/images/marker-icon-2x.png";
+import markerShadowUrl from "../../../node_modules/leaflet/dist/images/marker-shadow.png";
+
 
 interface Location {
   label: string;
@@ -92,6 +98,14 @@ export default function EventLocationPicker({
   onLocationChange,
   onLocationSelect,
 }: EventLocationPickerProps) {
+
+  // fix for leaflet marker
+  Icon.Default.prototype.options.iconUrl = markerIconUrl;
+  Icon.Default.prototype.options.iconRetinaUrl = markerIconRetinaUrl;
+  Icon.Default.prototype.options.shadowUrl = markerShadowUrl;
+  Icon.Default.imagePath = ""; // necessary to avoid Leaflet adds some prefix to image path.
+
+
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const markerRef = useRef<Marker | null>(null);
@@ -147,64 +161,65 @@ export default function EventLocationPicker({
     } else {
       markerRef.current.setLatLng(position);
     }
-    locationMap.setView(position, 16)}, [latitude, longitude]);
-  
+    locationMap.setView(position, 16)
+  }, [latitude, longitude]);
 
 
 
-    async function findLocation() {
-      if (!address) {
-        setMessage("Enter an address, city, or country first.");
-        return;
-      }
 
-      setIsSearching(true);
-      setResults([]);
-      setMessage("");
-
-      try {
-        const locations = await geocodeAddress(address);
-        setResults(locations);
-        if (!locations.length) setMessage("No matching location was found.");
-      } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Could not search for that address.");
-      } finally {
-        setIsSearching(false);
-      }
+  async function findLocation() {
+    if (!address) {
+      setMessage("Enter an address, city, or country first.");
+      return;
     }
 
-    function selectLocation(location: Location) {
-      onLocationSelect(location);
-      mapRef.current?.setView([location.latitude, location.longitude], 16);
-      setResults([]);
-      setMessage("Location selected. Drag the pin or click the map to refine it.");
+    setIsSearching(true);
+    setResults([]);
+    setMessage("");
+
+    try {
+      const locations = await geocodeAddress(address);
+      setResults(locations);
+      if (!locations.length) setMessage("No matching location was found.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not search for that address.");
+    } finally {
+      setIsSearching(false);
     }
-
-    const coordinatesText = latitude !== null && longitude !== null
-      ? `Saved coordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
-      : "No location selected yet. You can also click directly on the map.";
-
-    return (
-      <fieldset className="location-picker">
-        <legend>Event location</legend>
-        <p className="field-hint">Search after completing the address fields, then confirm the pin on the map.</p>
-        <button type="button" className="button button--secondary" onClick={() => void findLocation()} disabled={isSearching}>
-          {isSearching ? "Finding location..." : "Find on map"}
-        </button>
-        {results.length ? (
-          <div className="location-results" aria-label="Address search results">
-            {results.map((result) => (
-              <button key={`${result.latitude}-${result.longitude}`} type="button" className="location-result" onClick={() => selectLocation(result)}>
-                {result.label}
-              </button>
-            ))}
-          </div>
-        ) : null}
-        <div ref={mapContainerRef} id={`${idPrefix}-location-map`} className="event-location-map" />
-        <small className="field-hint">
-          {coordinatesText}
-        </small>
-        {message ? <p className="location-message" role="status">{message}</p> : null}
-      </fieldset>
-    );
   }
+
+  function selectLocation(location: Location) {
+    onLocationSelect(location);
+    mapRef.current?.setView([location.latitude, location.longitude], 16);
+    setResults([]);
+    setMessage("Location selected. Drag the pin or click the map to refine it.");
+  }
+
+  const coordinatesText = latitude !== null && longitude !== null
+    ? `Saved coordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+    : "No location selected yet. You can also click directly on the map.";
+
+  return (
+    <fieldset className="location-picker">
+      <legend>Event location</legend>
+      <p className="field-hint">Search after completing the address fields, then confirm the pin on the map.</p>
+      <button type="button" className="button button--secondary" onClick={() => void findLocation()} disabled={isSearching}>
+        {isSearching ? "Finding location..." : "Find on map"}
+      </button>
+      {results.length ? (
+        <div className="location-results" aria-label="Address search results">
+          {results.map((result) => (
+            <button key={`${result.latitude}-${result.longitude}`} type="button" className="location-result" onClick={() => selectLocation(result)}>
+              {result.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+      <div ref={mapContainerRef} id={`${idPrefix}-location-map`} className="event-location-map" />
+      <small className="field-hint">
+        {coordinatesText}
+      </small>
+      {message ? <p className="location-message" role="status">{message}</p> : null}
+    </fieldset>
+  );
+}
