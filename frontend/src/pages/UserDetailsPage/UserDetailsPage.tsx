@@ -9,7 +9,6 @@ export default function UserDetailsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(Boolean(userId));
   const [error, setError] = useState(userId ? "" : "Missing user id.");
-  const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
     if (!userId) return;
@@ -36,7 +35,6 @@ export default function UserDetailsPage() {
     if (!userId) return;
 
     try {
-      setStatusMessage("");
 
       const response = await fetch(
         `http://localhost:8080/api/auth/approveStatus/${userId}`,
@@ -56,9 +54,8 @@ export default function UserDetailsPage() {
           : current
       );
 
-      setStatusMessage("User approved successfully.");
     } catch (error) {
-      setStatusMessage(
+      setError(
         error instanceof Error
           ? error.message
           : "Could not approve user."
@@ -70,7 +67,6 @@ export default function UserDetailsPage() {
     if (!userId) return;
 
     try {
-      setStatusMessage("");
 
       const response = await fetch(
         `http://localhost:8080/api/auth/rejectStatus/${userId}`,
@@ -90,9 +86,8 @@ export default function UserDetailsPage() {
           : current
       );
 
-      setStatusMessage("User rejected successfully.");
     } catch (error) {
-      setStatusMessage(
+      setError(
         error instanceof Error
           ? error.message
           : "Could not reject user."
@@ -104,7 +99,6 @@ export default function UserDetailsPage() {
     if (!userId) return;
 
     try {
-      setStatusMessage("");
 
       const response = await fetch(
         `http://localhost:8080/api/auth/changeRole/${userId}`,
@@ -117,33 +111,31 @@ export default function UserDetailsPage() {
           body: "ADMIN",
         }
       );
-   
 
-    if (!response.ok) {
-      throw new Error("Could not change user role.");
+
+      if (!response.ok) {
+        throw new Error("Could not change user role.");
+      }
+
+      setUser((current) =>
+        current
+          ? { ...current, role: "ADMIN" }
+          : current
+      );
+
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Could not change user role."
+      );
     }
-
-    setUser((current) =>
-      current
-        ? { ...current, role: "ADMIN" }
-        : current
-    );
-
-    setStatusMessage("User changed successfully.");
-  } catch (error) {
-    setStatusMessage(
-      error instanceof Error
-        ? error.message
-        : "Could not change user role."
-    );
   }
-}
 
-async function handleOrganiser() {
+  async function handleOrganizer() {
     if (!userId) return;
 
     try {
-      setStatusMessage("");
 
       const response = await fetch(
         `http://localhost:8080/api/auth/changeRole/${userId}`,
@@ -156,59 +148,60 @@ async function handleOrganiser() {
           body: "ORGANIZER",
         }
       );
-   
 
-    if (!response.ok) {
-      throw new Error("Could not change user role.");
+
+      if (!response.ok) {
+        throw new Error("Could not change user role.");
+      }
+
+      setUser((current) =>
+        current
+          ? { ...current, role: "ORGANIZER" }
+          : current
+      );
+
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Could not change user role."
+      );
     }
-
-    setUser((current) =>
-      current
-        ? { ...current, role: "ORGANIZER" }
-        : current
-    );
-
-    setStatusMessage("User  changed successfully.");
-  } catch (error) {
-    setStatusMessage(
-      error instanceof Error
-        ? error.message
-        : "Could not change user role."
-    );
   }
-}
 
 
 
-return (
-  <main className="page page--narrow">
-    <Link to="/users">Back to users</Link>
-    {isLoading ? <p className="page-message">Loading user...</p> : null}
-    {error ? <p className="page-message page-message--error" role="alert">{error}</p> : null}
-    {!isLoading && !error && !user ? <p className="page-message">User not found.</p> : null}
-    {user ? (
-      <article className="panel">
-        <header className="page-header">
-          <div>
-            <h1>{user.firstName} {user.lastName}</h1>
-            <p>{(user.role)}</p>
+  return (
+    <main className="page page--narrow">
+      <Link to="/users">Back to users</Link>
+      {isLoading ? <p className="page-message">Loading user...</p> : null}
+      {error ? <p className="page-message page-message--error" role="alert">{error}</p> : null}
+      {!isLoading && !error && !user ? <p className="page-message">User not found.</p> : null}
+      {user ? (
+        <article className="panel">
+          <header className="page-header">
+            <div>
+              <h1>{user.firstName} {user.lastName}</h1>
+              <p>{(user.role)}</p>
+            </div>
+          </header>
+          <dl className="details-list">
+            <div><dt>Email</dt><dd><a href={`mailto:${user.email}`}>{user.email}</a></dd></div>
+            <div><dt>Phone</dt><dd>{user.phoneNumber ?? "Not provided"}</dd></div>
+            <div><dt>Status</dt><dd>{user.status}</dd></div>
+          </dl>
+          <div className="page-actions">
+            {user.status === "PENDING" && <>
+              <Button onClick={handleApprove}>Approve</Button>
+              <Button variant="danger" onClick={handleReject}>Reject</Button>
+            </>}
+            {user.status === "APPROVED" && user.role === "USER" && <>
+              <Button onClick={handleAdmin}>Set as admin</Button>
+              <Button onClick={handleOrganizer}>Set as organizer</Button>
+            </>}
           </div>
-        </header>
-        <dl className="details-list">
-          <div><dt>Email</dt><dd><a href={`mailto:${user.email}`}>{user.email}</a></dd></div>
-          <div><dt>Phone</dt><dd>{user.phoneNumber ?? "Not provided"}</dd></div>
-          <div><dt>Status</dt><dd>{user.status}</dd></div>
-        </dl>
-        <div className="page-actions">
-          <Button disabled={user.status === "APPROVED" || user.status === "REJECTED"} onClick={handleApprove}>Approve</Button>
-          <Button variant="danger" disabled={user.status === "APPROVED" || user.status === "REJECTED"} onClick={handleReject}>Reject</Button>
-          <Button disabled={user.role === "ADMIN" ||user.role==="ORGANIZER"} onClick={handleAdmin}>Set as admin</Button>
-          <Button disabled={user.role==="ORGANIZER"|| user.role==="ADMIN"} onClick={handleOrganiser}>Set as organizer</Button>
-        </div>
-
-        {statusMessage ? <p className="mock-data-note" role="status">{user.status}</p> : null}
-      </article>
-    ) : null}
-  </main>
-);
+        </article>
+      ) : null}
+    </main>
+  );
 }

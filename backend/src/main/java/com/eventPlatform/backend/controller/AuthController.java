@@ -150,7 +150,7 @@ public class AuthController {
         if(user == null){
             throw new RuntimeException("User not found");
         }
-        if(role.equals("ADMIN") || role.equals("ORGANISER")){
+        if(role.equals("ADMIN") || role.equals("ORGANIZER")){
             user.setRole(role);
             userService.saveUser(user);
         }else{
