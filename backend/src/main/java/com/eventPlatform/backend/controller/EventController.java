@@ -6,7 +6,9 @@ import com.eventPlatform.backend.service.EventService;
 import com.eventPlatform.backend.service.FileStorageService;
 
 import com.eventPlatform.backend.service.RecommendationService;
+
 import jakarta.transaction.Transactional;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,22 +17,39 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.http.HttpHeaders;
+
+import com.eventPlatform.backend.service.XmlExportService;
+
+import com.eventPlatform.backend.service.JsonExportService;
+
 @RestController
+
 @RequestMapping("/api/events")
 public class EventController {
 
     private final EventService eventService;
     private final RecommendationService recommendationService;
     private final FileStorageService fileStorageService;
+    private final XmlExportService xmlExportService;
+    private final JsonExportService jsonExportService;
 
     public EventController(
             EventService eventService,
             FileStorageService fileStorageService,
-        RecommendationService recommendationService) {
+            RecommendationService recommendationService,
+            XmlExportService xmlExportService,
+            JsonExportService jsonExportService
+    ) {
+        {
 
-        this.eventService = eventService;
-        this.fileStorageService = fileStorageService;
-        this.recommendationService = recommendationService;
+            this.eventService = eventService;
+            this.fileStorageService = fileStorageService;
+            this.recommendationService = recommendationService;
+            this.xmlExportService = xmlExportService;
+            this.jsonExportService = jsonExportService;
+
+        }
     }
 
     @GetMapping
@@ -45,11 +64,10 @@ public class EventController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-
     @PostMapping(value = "/createEvent", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Event createEvent(
             @RequestPart("event") Event event,
-            @RequestPart(value = "files", required = false)   //add multiple files
+            @RequestPart(value = "files", required = false) //add multiple files
             List<MultipartFile> files
     ) throws IOException {
 
@@ -59,8 +77,8 @@ public class EventController {
 
                 if (!file.isEmpty()) {
 
-                    String imageUrl =
-                            fileStorageService.store(file);
+                    String imageUrl
+                            = fileStorageService.store(file);
 
                     Media media = new Media();
 
@@ -81,8 +99,7 @@ public class EventController {
     )
     public Event editEvent(
             @RequestPart("event") Event event,
-            @RequestPart(value = "files", required = false)
-            List<MultipartFile> files
+            @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) throws IOException {
 
         Event temp = eventService.findById(event.getId());
@@ -151,14 +168,14 @@ public class EventController {
             temp.setOrganizer(event.getOrganizer());
         }
 
-        if (event.getTicketTypes() != null &&
-                !event.getTicketTypes().isEmpty()) {
+        if (event.getTicketTypes() != null
+                && !event.getTicketTypes().isEmpty()) {
 
             temp.setTicketTypes(event.getTicketTypes());
         }
 
-        if (event.getBookings() != null &&
-                !event.getBookings().isEmpty()) {
+        if (event.getBookings() != null
+                && !event.getBookings().isEmpty()) {
 
             temp.setBookings(event.getBookings());
         }
@@ -188,9 +205,8 @@ public class EventController {
                 }
             }
         }
-          return eventService.saveEvent(temp);
+        return eventService.saveEvent(temp);
     }
-   
 
     @DeleteMapping("/{id}")
     @Transactional
@@ -201,7 +217,33 @@ public class EventController {
 
         return ResponseEntity.noContent().build();
     }
-}
-   
 
-    
+    @GetMapping("/export/xml")
+    public ResponseEntity<byte[]> exportXml() throws Exception {
+
+        byte[] xml = xmlExportService.exportEventsToXml();
+
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=events.xml"
+                )
+                .contentType(MediaType.APPLICATION_XML)
+                .body(xml);
+    }
+
+    @GetMapping("/export/json")
+    public ResponseEntity<byte[]> exportJson() throws Exception {
+
+        byte[] json = jsonExportService.exportEventsToJson();
+
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=events.json"
+                )
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(json);
+
+    }
+}

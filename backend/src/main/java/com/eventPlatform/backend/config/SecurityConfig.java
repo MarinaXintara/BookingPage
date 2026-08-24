@@ -23,13 +23,14 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {})
+                .cors(cors -> {
+                })
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/events/**").permitAll()
-                        .requestMatchers("/api/Booking/**").permitAll()
-                        .requestMatchers("/api/users/**").permitAll() //use later hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/events/**").permitAll()
+                .requestMatchers("/api/Booking/**").permitAll()
+                .requestMatchers("/api/users/**").permitAll() //use later hasRole("ADMIN")
+                .anyRequest().authenticated()
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
