@@ -1,5 +1,6 @@
 package com.eventPlatform.backend.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,9 +11,13 @@ import java.util.UUID;
 @Service
 public class FileStorageService {
 
-    private final Path directory = Paths.get("uploads", "events")
-            .toAbsolutePath()
-            .normalize();
+    private final Path directory;
+
+    public FileStorageService(@Value("${app.upload.directory:uploads}") String uploadDirectory) {
+        this.directory = Paths.get(uploadDirectory, "events")
+                .toAbsolutePath()
+                .normalize();
+    }
 
     public String store(MultipartFile file) throws IOException {
 

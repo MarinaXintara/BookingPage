@@ -29,5 +29,11 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# Runtime uploads: retain the directory structure, never commit user media.
+/uploads/**
+!/uploads/events/
+/uploads/events/**
+!/uploads/events/.gitkeep
+
 ### VS Code ###
 .vscode/
