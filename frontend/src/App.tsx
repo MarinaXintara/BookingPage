@@ -10,6 +10,7 @@ import { Home } from './pages/HomePage/Home.tsx';
 import Login from "./pages/LoginPage/Login.tsx";
 import Messaging from './pages/Messaging/Messaging.tsx';
 import GetBookings from './pages/myBookings/myBookings.tsx';
+import OrganiserBookings from './pages/myBookings/organiserBookings.tsx';
 import CreateEvent from './pages/OrganiseEvent/CreateEvent/CreateEvent.tsx';
 import EditEvent from './pages/OrganiseEvent/EditEvent/EditEvent.tsx';
 import Profile from './pages/profile/Profile.tsx';
@@ -40,6 +41,7 @@ function App() {
               <Route path="/createEvent" element={<CreateEvent />} />
               <Route path="/editEvent/:eventId" element={<EditEvent />} />
               <Route path="/myBookings" element={<GetBookings />} />
+              <Route path="/organiserBookings" element={<OrganiserBookings />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
           </Route>
