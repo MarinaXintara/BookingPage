@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import { fetchOrganiserBookings, type Booking } from "./bookingApi";
+import { fetchEvents, type Event } from "../EventPage/eventApi";
+
+interface BookingRow extends Booking {
+  event: Event | null;
+}
 
 const currencyFormatter = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -7,15 +12,28 @@ const currencyFormatter = new Intl.NumberFormat("en-GB", {
 });
 
 export default function OrganiserBookings() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const controller = new AbortController();
 
-    fetchOrganiserBookings(controller.signal)
-      .then(setBookings)
+    Promise.all([fetchOrganiserBookings(controller.signal), fetchEvents(controller.signal)])
+      .then(([bookingData, events]) => {
+        const eventByTicketType = new Map<number, Event>();
+
+        events.forEach((event) => {
+          event.ticketTypes.forEach((ticketType) => {
+            eventByTicketType.set(ticketType.id, event);
+          });
+        });
+
+        setBookings(bookingData.map((booking) => ({
+          ...booking,
+          event: eventByTicketType.get(booking.ticketType.id) ?? null,
+        })));
+      })
       .catch((loadError: unknown) => {
         if (!(loadError instanceof DOMException && loadError.name === "AbortError")) {
           setError(loadError instanceof Error ? loadError.message : "Could not load event bookings.");
@@ -48,18 +66,26 @@ export default function OrganiserBookings() {
           <table className="data-table">
             <thead>
               <tr>
+                <th scope="col">Event title</th>
+                <th scope="col">User ID</th>
+                <th scope="col">User name</th>
                 <th scope="col">Ticket</th>
                 <th scope="col">Quantity</th>
                 <th scope="col">Total</th>
-                <th scope="col">Status</th>
+                <th scope="col">Event status</th>
+                <th scope="col">Booking status</th>
               </tr>
             </thead>
             <tbody>
               {bookings.map((booking) => (
                 <tr key={booking.id}>
-                  <th scope="row">{booking.ticketType.name}</th>
+                  <td>{booking.event?.title ?? "Unavailable event"}</td>
+                  <td>{booking.attendee.id}</td>
+                  <th scope="row">{booking.attendee.firstName} {booking.attendee.lastName}</th>
+                  <td>{booking.ticketType.name}</td>
                   <td>{booking.numberOfTickets}</td>
                   <td>{currencyFormatter.format(booking.totalCost)}</td>
+                  <td>{booking.event?.status?.toLowerCase() ?? "unavailable"}</td>
                   <td className={`status status--${booking.bookingStatus.toLowerCase()}`}>
                     {booking.bookingStatus.toLowerCase()}
                   </td>
