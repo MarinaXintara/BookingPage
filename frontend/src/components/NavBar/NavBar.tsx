@@ -28,6 +28,16 @@ export default function NavBar() {
             Users
           </NavLink>
         ) : null}
+        {user?.role === "ADMIN" ? (
+          <NavLink className={linkClassName} to="/users">
+            Users
+          </NavLink>
+        ) : null}
+        {user?.role === "ORGANIZER" ? (
+          <NavLink className={linkClassName} to="/organiserBookings">
+            Event bookings
+          </NavLink>
+        ) : null}
       </div>
 
       <UserIconComponent />
