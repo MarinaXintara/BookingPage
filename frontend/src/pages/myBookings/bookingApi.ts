@@ -6,6 +6,11 @@ export interface Booking {
   numberOfTickets: number;
   totalCost: number;
   bookingStatus: BookingStatus;
+  attendee: {
+    id: number;
+    firstName: string;
+    lastName: string;
+  };
   ticketType: {
     id: number;
     name: string;
