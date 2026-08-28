@@ -45,5 +45,6 @@ const pagePermissions: Record<string, Role[]> = {
     "/profile":             ["ADMIN", "ORGANIZER", "USER"],
     "/booking":             ["ADMIN", "ORGANIZER", "USER"],
     "/myBookings":          ["ADMIN", "ORGANIZER", "USER"],
+    "/organiserBookings":   ["ORGANIZER"],
 
 };

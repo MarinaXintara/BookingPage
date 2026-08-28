@@ -66,6 +66,12 @@ export default function UserIconComponent() {
             My bookings
           </Link>
 
+          {user.role === "ORGANIZER"  ? (
+            <Link to="/organiserBookings" onClick={() => setIsOpen(false)}>
+              Event bookings
+            </Link>
+          ) : null}
+
           <Button
             variant="secondary"
             disabled={isLoggingOut}
