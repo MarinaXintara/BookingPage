@@ -2,6 +2,7 @@ package com.eventPlatform.backend.controller;
 
 import com.eventPlatform.backend.DTO.BookingRequest;
 import com.eventPlatform.backend.entity.Booking;
+import com.eventPlatform.backend.enums.BookingStatus;
 import com.eventPlatform.backend.service.BookingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -65,26 +66,25 @@ public class BookingController {
 //    public Booking editEvent(@RequestBody Booking booking) {
 //    }
 
-   /*  @PostMapping("{id}/status")
-    public String editBookingStatus(@PathVariable Long id, @RequestBody BookingStatus bookingStatus, Authentication authentication) {
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Booking> editBookingStatus(@PathVariable Long id, @RequestBody BookingStatus bookingStatus, Authentication authentication) {
 
         if(authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("Not logged in");
+            return ResponseEntity.status(401).build();
         }
         Booking booking = bookingService.findById(id);
         if(booking == null) {
-            throw new RuntimeException("Booking not found");
+            return ResponseEntity.notFound().build();
         }
+
+        Long organizerId = Long.parseLong(authentication.getName());
+        if (booking.getEvent() == null || booking.getEvent().getOrganizer() == null
+                || !organizerId.equals(booking.getEvent().getOrganizer().getId())) {
+            return ResponseEntity.status(403).build();
+        }
+
         booking.setBookingStatus(bookingStatus);
-        bookingService.saveBooking(booking);
-        return "Switched Booking Status";
+        return ResponseEntity.ok(bookingService.saveBooking(booking));
     }
 
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
-        bookingService.deleteBooking(id);
-        return ResponseEntity.noContent().build();
-    }
- */
 }

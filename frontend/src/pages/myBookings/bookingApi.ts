@@ -56,6 +56,7 @@ export async function fetchOrganiserBookings(signal?: AbortSignal): Promise<Book
   return response.json();
 }
 
+
 export async function fetchBooking(id: string, signal?: AbortSignal): Promise<Booking> {
   const response = await fetch(`http://localhost:8080/api/Booking/${id}`, {
     method: "GET",
@@ -69,3 +70,26 @@ export async function fetchBooking(id: string, signal?: AbortSignal): Promise<Bo
 
   return response.json();
 }
+
+export const updateBookingStatus = async (
+  bookingId: number,
+  status: BookingStatus
+) => {
+  const response = await fetch(
+    `http://localhost:8080/api/Booking/${bookingId}/status`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ status }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to update booking status");
+  }
+
+  return response.json();
+};
