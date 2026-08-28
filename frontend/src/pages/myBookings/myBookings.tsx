@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchEvents, type Event } from "../EventPage/eventApi";
 import { fetchBookings, type Booking } from "./bookingApi";
+import { useAuth } from "../Auth/useAuth";
 
 interface BookingRow extends Booking {
   event: Event | null;
@@ -17,6 +18,9 @@ function formatDate(value?: string) {
 }
 
 export default function MyBookingsPage() {
+
+  const { user } = useAuth();
+
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -66,6 +70,14 @@ export default function MyBookingsPage() {
               ))}
             </tbody>
           </table>
+          {user?.role==="ORGANISER"?(
+          <Link
+                className="button button--secondary"
+                to="/organiserBookings"
+              >
+                My requests
+              </Link>
+              ) : null}
         </div>
       ) : null}
     </main>
