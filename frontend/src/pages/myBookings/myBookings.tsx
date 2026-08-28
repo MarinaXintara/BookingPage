@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchEvents, type Event } from "../EventPage/eventApi";
 import { fetchBookings, type Booking } from "./bookingApi";
-import { useAuth } from "../Auth/useAuth";
+import { useAuth } from "../../Auth/useAuth";
 
 interface BookingRow extends Booking {
   event: Event | null;
@@ -70,12 +70,9 @@ export default function MyBookingsPage() {
               ))}
             </tbody>
           </table>
-          {user?.role==="ORGANISER"?(
-          <Link
-                className="button button--secondary"
-                to="/organiserBookings"
-              >
-                My requests
+          {user?.role === "ORGANIZER" ? (
+            <Link className="button button--secondary" to="/organiserBookings">
+              Event bookings
               </Link>
               ) : null}
         </div>
