@@ -33,6 +33,24 @@ export async function fetchBookings(signal?: AbortSignal): Promise<Booking[]> {
   return response.json();
 }
 
+export async function fetchOrganiserBookings(signal?: AbortSignal): Promise<Booking[]> {
+  const response = await fetch("http://localhost:8080/api/Booking/organiserBookings", {
+    method: "GET",
+    credentials: "include",
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      response.status === 401
+        ? "Please log in to view your event bookings."
+        : "Could not load event bookings."
+    );
+  }
+
+  return response.json();
+}
+
 export async function fetchBooking(id: string, signal?: AbortSignal): Promise<Booking> {
   const response = await fetch(`http://localhost:8080/api/Booking/${id}`, {
     method: "GET",

@@ -41,6 +41,16 @@ public class BookingController {
         return bookingService.getBookingsByUser(userId);
     }
 
+    @GetMapping("/organiserBookings")
+    public List<Booking> getOrganiserBookings(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Not logged in");
+        }
+
+        Long organizerId = Long.parseLong(authentication.getName());
+        return bookingService.getBookingsForOrganizer(organizerId);
+    }
+
     @PostMapping("/createBooking")
     public Booking createBooking(@RequestBody BookingRequest request,Authentication authentication) {
         if(authentication == null || !authentication.isAuthenticated()) {

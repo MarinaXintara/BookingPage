@@ -43,6 +43,10 @@ public class BookingService {
         return bookingRepository.findByAttendeeId(userId);
     }
 
+    public List<Booking> getBookingsForOrganizer(Long organizerId) {
+        return bookingRepository.findByEventOrganizerId(organizerId);
+    }
+
     public Booking saveBooking(Booking booking) {
         return bookingRepository.save(booking);
     }
