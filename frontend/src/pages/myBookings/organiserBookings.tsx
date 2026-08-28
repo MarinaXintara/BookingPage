@@ -20,6 +20,7 @@ export default function OrganiserBookings() {
     const [bookings, setBookings] = useState<BookingRow[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
+    const [updatingBookingId, setUpdatingBookingId] = useState<number | null>(null);
 
 
     useEffect(() => {
@@ -51,6 +52,26 @@ export default function OrganiserBookings() {
 
         return () => controller.abort();
     }, []);
+
+    async function handleStatusChange(booking: BookingRow, bookingStatus: BookingStatus) {
+        if (bookingStatus === booking.bookingStatus) return;
+
+        setUpdatingBookingId(booking.id);
+        setError("");
+
+        try {
+            const updatedBooking = await updateBookingStatus(booking.id, bookingStatus);
+            setBookings((currentBookings) => currentBookings.map((currentBooking) => (
+                currentBooking.id === booking.id
+                    ? { ...currentBooking, bookingStatus: updatedBooking.bookingStatus }
+                    : currentBooking
+            )));
+        } catch (updateError: unknown) {
+            setError(updateError instanceof Error ? updateError.message : "Could not update booking status.");
+        } finally {
+            setUpdatingBookingId(null);
+        }
+    }
 
 
     return (
@@ -94,23 +115,11 @@ export default function OrganiserBookings() {
                                     <td>
                                         <select
                                             value={booking.bookingStatus}
-                                            onChange={async (e) => {
-                                                const newStatus = e.target.value as BookingStatus;
-
-                                                try {
-                                                    await updateBookingStatus(booking.id, newStatus);
-
-                                                    setBookings((prevBookings) =>
-                                                        prevBookings.map((b) =>
-                                                            b.id === booking.id
-                                                                ? { ...b, status: newStatus }
-                                                                : b
-                                                        )
-                                                    );
-                                                } catch (error) {
-                                                    console.error("Failed to update booking status:", error);
-                                                }
-                                            }}
+                                            disabled={updatingBookingId === booking.id}
+                                            onChange={(event) => handleStatusChange(
+                                                booking,
+                                                event.target.value as BookingStatus,
+                                            )}
                                         >
                                             <option value="PENDING">Pending</option>
                                             <option value="CONFIRMED">Confirmed</option>
