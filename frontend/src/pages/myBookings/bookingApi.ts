@@ -71,10 +71,10 @@ export async function fetchBooking(id: string, signal?: AbortSignal): Promise<Bo
   return response.json();
 }
 
-export const updateBookingStatus = async (
+export async function updateBookingStatus(
   bookingId: number,
-  status: BookingStatus
-) => {
+  bookingStatus: BookingStatus,
+): Promise<Booking> {
   const response = await fetch(
     `http://localhost:8080/api/Booking/${bookingId}/status`,
     {
@@ -83,7 +83,7 @@ export const updateBookingStatus = async (
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(bookingStatus),
     }
   );
 
@@ -91,5 +91,5 @@ export const updateBookingStatus = async (
     throw new Error("Failed to update booking status");
   }
 
-  return response.json();
-};
+  return response.json() as Promise<Booking>;
+}
