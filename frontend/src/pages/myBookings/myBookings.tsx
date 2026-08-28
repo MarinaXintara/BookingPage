@@ -73,8 +73,8 @@ export default function MyBookingsPage() {
           {user?.role === "ORGANIZER" ? (
             <Link className="button button--secondary" to="/organiserBookings">
               Event bookings
-              </Link>
-              ) : null}
+            </Link>
+          ) : null}
         </div>
       ) : null}
     </main>
