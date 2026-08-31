@@ -7,4 +7,21 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 public class MessagesService {
+
+    private MessagesRepository messagesRepository;
+
+    public MessagesService(MessagesRepository messagesRepository) {
+        this.messagesRepository = messagesRepository;
+    }
+
+    public List<Messages> getMessagesBySenderId(Long userId) {
+        return messagesRepository.findBySenderId(userId);
+    }
+    public List<Messages> getMessagesByRecipientId(Long userId) {
+        return messagesRepository.findByRecipientId(userId);
+    }
+
+    public Messages saveMessages(Messages messages) {
+        return messagesRepository.save(messages);
+    }
 }
