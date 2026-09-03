@@ -38,13 +38,17 @@ public class UserController {
         return user;
     }
 
-    @GetMapping("/getOrganizers")
+    @GetMapping("/getNonUsers")
     public List<UserResponse> getAllOrganisers() {
 
-        List<User> allUsers = userService.findByRole("organizer");
+        List<User> organisersUsers = userService.findByRole("ORGANIZER");
+        List<User> adminUsers = userService.findByRole("ADMIN");
         List<UserResponse> userResponses = new ArrayList<>();
 
-        for(User u : allUsers) {
+        for(User u : organisersUsers) {
+            userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),u.getPhoneNumber(),u.getAddress(), u.getRole(), u.getStatus()));
+        }
+        for(User u : adminUsers) {
             userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),u.getPhoneNumber(),u.getAddress(), u.getRole(), u.getStatus()));
         }
         return userResponses;
