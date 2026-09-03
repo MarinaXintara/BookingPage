@@ -57,13 +57,12 @@ public class MessageController {
         return messagesService.getMessagesByRecipientIdAndStatus(userId , "READ");
     }
 
-    @DeleteMapping("/deleteMessage")
-    public void deleteMessages(Authentication authentication, Messages message) {
+    @DeleteMapping("/deleteMessage/{id}")
+    public void deleteMessages(Authentication authentication,@PathVariable Long id) {
         if(authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("Not logged in");
         }
-        Long messagesId = message.getId();
-        messagesService.deleteMessage(messagesId);
+        messagesService.deleteMessage(id);
     }
 
 }
