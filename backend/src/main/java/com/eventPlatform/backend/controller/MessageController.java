@@ -26,7 +26,7 @@ public class MessageController {
 
     @PostMapping
     public Messages createMessages(@RequestBody Messages messages) {
-        messages.setStatus("UNREAD");
+        messages.setStatus(false);
         return messagesService.saveMessages(messages);
     }
 
@@ -54,7 +54,7 @@ public class MessageController {
             throw new RuntimeException("Not logged in");
         }
         Long userId = Long.parseLong(authentication.getName());
-        return messagesService.getMessagesByRecipientIdAndStatus(userId , "READ");
+        return messagesService.getMessagesByRecipientIdAndStatus(userId , true);
     }
 
     @DeleteMapping("/deleteMessage/{id}")
