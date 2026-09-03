@@ -40,6 +40,7 @@ public class MessageController {
         List<MessageResponse> messageResponse = new ArrayList<>();
         for (Messages u : messages) {
             messageResponse.add(new MessageResponse(
+                    u.getId(),
                     u.getSender().getId(),
                     u.getSender().getFirstName() + " " + u.getSender().getLastName(),
                     u.getRecipient().getId(),
@@ -65,6 +66,7 @@ public class MessageController {
         List<MessageResponse> messageResponse = new ArrayList<>();
         for (Messages u : messages) {
             messageResponse.add(new MessageResponse(
+                    u.getId(),
                     u.getSender().getId(),
                     u.getSender().getFirstName() + " " + u.getSender().getLastName(),
                     u.getRecipient().getId(),

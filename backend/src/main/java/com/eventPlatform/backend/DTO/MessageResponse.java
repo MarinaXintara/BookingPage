@@ -1,6 +1,7 @@
 package com.eventPlatform.backend.DTO;
 
 public class MessageResponse {
+    private Long id;
     private Long senderId;
     private String senderName;
     private Long receiverId;
@@ -13,6 +14,7 @@ public class MessageResponse {
     private String createdAt;
 
     public MessageResponse(
+            Long id,
             Long senderId,
             String senderName,
             Long receiverId,
@@ -24,6 +26,7 @@ public class MessageResponse {
             boolean isRead,
             String createdAt
     ) {
+        this.id = id;
         this.senderId = senderId;
         this.senderName = senderName;
         this.receiverId = receiverId;
@@ -34,6 +37,10 @@ public class MessageResponse {
         this.message = message;
         this.isRead = isRead;
         this.createdAt = createdAt;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setSenderId(Long senderId) {
