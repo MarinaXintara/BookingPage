@@ -29,6 +29,9 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
     }
+    public List<User> findByRole(String role) {
+        return userRepository.findByRole(role);
+    }
     public User save(User user) {
         return userRepository.save(user);
 }

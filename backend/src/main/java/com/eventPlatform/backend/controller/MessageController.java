@@ -41,7 +41,7 @@ public class MessageController {
         return messagesService.getMessagesBySenderId(userId);
     }
 
-    @GetMapping("/receievedMessages")
+    @GetMapping("/receivedMessages")
     public List<Messages> getReceivedMessages(Authentication authentication) {
         if(authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("Not logged in");
