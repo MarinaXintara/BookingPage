@@ -27,7 +27,9 @@ public class Messages {
     private String message;
 
     @Column(nullable = false)
-    private String status;
+    private boolean status;
+
+    private String createdAt;
 
     public Long getId() {
         return id;
@@ -77,11 +79,11 @@ public class Messages {
         this.message = message;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(boolean status) {
         this.status = status;
     }
 
-    public String getStatus() {
+    public boolean getStatus() {
         return status;
     }
 }
