@@ -1,5 +1,7 @@
 package com.eventPlatform.backend.controller;
 
+import com.eventPlatform.backend.DTO.MessageResponse;
+import com.eventPlatform.backend.DTO.UserResponse;
 import com.eventPlatform.backend.entity.Messages;
 import com.eventPlatform.backend.entity.User;
 import com.eventPlatform.backend.service.BookingService;
@@ -9,6 +11,7 @@ import com.eventPlatform.backend.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/api/messages")
@@ -31,21 +34,50 @@ public class MessageController {
     }
 
     @GetMapping("/sentMessages")
-    public List<Messages> getSentMessages(Authentication authentication) {
-        if(authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("Not logged in");
-        }
+    public List<MessageResponse> getSentMessages(Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        return messagesService.getMessagesBySenderId(userId);
+        List<Messages> messages = messagesService.getMessagesBySenderId(userId);
+        List<MessageResponse> messageResponse = new ArrayList<>();
+        for (Messages u : messages) {
+            messageResponse.add(new MessageResponse(
+                    u.getSender().getId(),
+                    u.getSender().getFirstName() + " " + u.getSender().getLastName(),
+                    u.getRecipient().getId(),
+                    u.getRecipient().getFirstName() + " " + u.getRecipient().getLastName(),
+                    u.getEvent() != null ? u.getEvent().getId() : 0,
+                    u.getEvent() != null ? u.getEvent().getTitle() : null,
+                    u.getSubject(),
+                    u.getMessage(),
+                    u.getStatus(),
+                    u.getCreatedAt()
+            ));
+        }
+        return messageResponse;
     }
 
     @GetMapping("/receivedMessages")
-    public List<Messages> getReceivedMessages(Authentication authentication) {
+    public List<MessageResponse> getReceivedMessages(Authentication authentication) {
         if(authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("Not logged in");
         }
         Long userId = Long.parseLong(authentication.getName());
-        return messagesService.getMessagesByRecipientId(userId);
+        List<Messages> messages = messagesService.getMessagesByRecipientId(userId);
+        List<MessageResponse> messageResponse = new ArrayList<>();
+        for (Messages u : messages) {
+            messageResponse.add(new MessageResponse(
+                    u.getSender().getId(),
+                    u.getSender().getFirstName() + " " + u.getSender().getLastName(),
+                    u.getRecipient().getId(),
+                    u.getRecipient().getFirstName() + " " + u.getRecipient().getLastName(),
+                    u.getEvent() != null ? u.getEvent().getId() : 0,
+                    u.getEvent() != null ? u.getEvent().getTitle() : null,
+                    u.getSubject(),
+                    u.getMessage(),
+                    u.getStatus(),
+                    u.getCreatedAt()
+            ));
+        }
+        return messageResponse;
     }
 
     @GetMapping("/getAllReadMessages")

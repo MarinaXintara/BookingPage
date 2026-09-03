@@ -1,64 +1,75 @@
 package com.eventPlatform.backend.DTO;
 
 public class MessageResponse {
-    private int senderId;
-    private int recipientId;
-    private int eventId;
+    private Long senderId;
+    private String senderName;
+    private Long receiverId;
+    private String receiverName;
+    private Long eventId;
+    private String eventName;
     private String subject;
     private String message;
     private boolean isRead;
     private String createdAt;
 
-    public int getSenderId() {
-        return senderId;
+    public MessageResponse(
+            Long senderId,
+            String senderName,
+            Long receiverId,
+            String receiverName,
+            Long eventId,
+            String eventName,
+            String subject,
+            String message,
+            boolean isRead,
+            String createdAt
+    ) {
+        this.senderId = senderId;
+        this.senderName = senderName;
+        this.receiverId = receiverId;
+        this.receiverName = receiverName;
+        this.eventId = eventId;
+        this.eventName = eventName;
+        this.subject = subject;
+        this.message = message;
+        this.isRead = isRead;
+        this.createdAt = createdAt;
     }
 
-    public void setSenderId(int senderId) {
+    public void setSenderId(Long senderId) {
         this.senderId = senderId;
     }
 
-    public int getRecipientId() {
-        return recipientId;
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 
-    public void setRecipientId(int recipientId) {
-        this.recipientId = recipientId;
+    public void setReceiverId(Long receiverId) {
+        this.receiverId = receiverId;
     }
 
-    public int getEventId() {
-        return eventId;
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
     }
 
-    public void setEventId(int eventId) {
+    public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
 
-    public String getSubject() {
-        return subject;
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
     }
 
     public void setSubject(String subject) {
         this.subject = subject;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
     public void setMessage(String message) {
         this.message = message;
     }
 
-    public boolean isRead() {
-        return isRead;
-    }
-
     public void setRead(boolean read) {
         isRead = read;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
     }
 
     public void setCreatedAt(String createdAt) {
