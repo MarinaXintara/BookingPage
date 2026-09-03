@@ -2,7 +2,9 @@ package com.eventPlatform.backend.controller;
 
 import com.eventPlatform.backend.DTO.UserResponse;
 import com.eventPlatform.backend.entity.User;
+import com.eventPlatform.backend.jwt.JwtService;
 import com.eventPlatform.backend.service.UserService;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +17,11 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService,JwtService jwtService) {
         this.userService = userService;
+        this.jwtService=jwtService;
     }
 
     @GetMapping
@@ -38,19 +42,43 @@ public class UserController {
         return user;
     }
 
-    @GetMapping("/getNonUsers")
-    public List<UserResponse> getAllOrganisers() {
+    @GetMapping("/getUsersForMessages")
+    public List<UserResponse> getAllOrganisers(Authentication authentication) {
+        if(authentication == null || !authentication.isAuthenticated()){
+            throw new RuntimeException("Not logged in");
+        }
 
-        List<User> organisersUsers = userService.findByRole("ORGANIZER");
-        List<User> adminUsers = userService.findByRole("ADMIN");
+        Long userId = Long.parseLong(authentication.getName());
+        User user = userService.findById(userId);
         List<UserResponse> userResponses = new ArrayList<>();
 
-        for(User u : organisersUsers) {
-            userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),u.getPhoneNumber(),u.getAddress(), u.getRole(), u.getStatus()));
+        if(user.getRole().equals("ADMIN")) {
+            List<User> allUsers = userService.getAllUsers();
+            for(User u : allUsers) {
+                userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),u.getPhoneNumber(),u.getAddress(), u.getRole(), u.getStatus()));
+            }
+        } else if (user.getRole().equals("USER")) {
+            List<User> organisersUsers = userService.findByRole("ORGANIZER");
+            List<User> adminUsers = userService.findByRole("ADMIN");
+
+            for(User u : organisersUsers) {
+                userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),u.getPhoneNumber(),u.getAddress(), u.getRole(), u.getStatus()));
+            }
+            for(User u : adminUsers) {
+                userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),u.getPhoneNumber(),u.getAddress(), u.getRole(), u.getStatus()));
+            }
+        } else if(user.getRole().equals("ORGANIZER")) {
+            List<User> usersUsers = userService.findByRole("USER");
+            List<User> adminUsers = userService.findByRole("ADMIN");
+
+            for(User u : usersUsers) {
+                userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),u.getPhoneNumber(),u.getAddress(), u.getRole(), u.getStatus()));
+            }
+            for(User u : adminUsers) {
+                userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),u.getPhoneNumber(),u.getAddress(), u.getRole(), u.getStatus()));
+            }
         }
-        for(User u : adminUsers) {
-            userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),u.getPhoneNumber(),u.getAddress(), u.getRole(), u.getStatus()));
-        }
+
         return userResponses;
     }
 

@@ -24,5 +24,5 @@ public class MessagesService {
     public Messages saveMessages(Messages messages) {
         return messagesRepository.save(messages);
     }
-    public List<Messages> getMessagesByRecipientIdAndStatus(Long userId,String status) {messagesRepository.findByRecipientIdAndStatus(userId,status);}
+    public List<Messages> getMessagesByRecipientIdAndStatus(Long userId,String status) {return messagesRepository.findByRecipientIdAndStatus(userId,status);}
 }
