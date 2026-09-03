@@ -4,7 +4,6 @@ import { useAuth } from "../../Auth/useAuth";
 import Button from "../../components/Button";
 import {
   deleteMessage,
-  getAvailableRecipients,
   getInbox,
   getSentMessages,
   markMessageAsRead,
@@ -13,7 +12,9 @@ import {
   type MessageContact,
   type MessageFolder,
   type SendMessageInput,
+  getRecipients,
 } from "./messagingApi";
+import { Controller } from "react-hook-form";
 
 interface ComposeDraft {
   eventId?: number;
@@ -187,9 +188,9 @@ export default function Messaging() {
     setStatus("loading");
 
     Promise.all([
-      getInbox(role, controller.signal),
-      getSentMessages(role, controller.signal),
-      getAvailableRecipients(role, controller.signal),
+      getInbox(controller.signal),
+      getSentMessages(controller.signal),
+      getRecipients(controller.signal),
     ])
       .then(([inboxMessages, sentMessages, availableContacts]) => {
         setInbox(inboxMessages);
@@ -209,7 +210,7 @@ export default function Messaging() {
   }, [role, loadAttempt]);
 
   if (!role) return null;
-  const activeRole: Role = role;
+  
 
   const messages = activeFolder === "inbox" ? inbox : sent;
   const selectedMessage = messages.find((message) => message.id === selectedId);
@@ -231,7 +232,7 @@ export default function Messaging() {
 
     setInbox((current) => current.map((item) => item.id === message.id ? { ...item, isRead: true } : item));
     try {
-      await markMessageAsRead(activeRole, message.id);
+      await markMessageAsRead( message.id);
     } catch {
       setInbox((current) => current.map((item) => item.id === message.id ? { ...item, isRead: false } : item));
       setFeedback({ type: "error", text: "Could not mark the message as read." });
@@ -242,7 +243,7 @@ export default function Messaging() {
     setIsSending(true);
     setFeedback(null);
     try {
-      const newMessage = await sendMessage(activeRole, input);
+      const newMessage = await sendMessage(input);
       setSent((current) => [newMessage, ...current]);
       setActiveFolder("sent");
       setSelectedId(newMessage.id);
@@ -263,7 +264,7 @@ export default function Messaging() {
     setFeedback(null);
 
     try {
-      await deleteMessage(activeRole, activeFolder, selectedMessage.id);
+      await deleteMessage(selectedMessage.id);
       const remaining = messages.filter((message) => message.id !== selectedMessage.id);
       if (activeFolder === "inbox") setInbox(remaining); else setSent(remaining);
       setSelectedId(remaining[0]?.id ?? null);
