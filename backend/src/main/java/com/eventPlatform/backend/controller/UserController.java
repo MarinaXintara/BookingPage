@@ -1,10 +1,12 @@
 package com.eventPlatform.backend.controller;
 
+import com.eventPlatform.backend.DTO.UserResponse;
 import com.eventPlatform.backend.entity.User;
 import com.eventPlatform.backend.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -34,6 +36,18 @@ public class UserController {
         }
 
         return user;
+    }
+
+    @GetMapping("/getOrganizers")
+    public List<UserResponse> getAllOrganisers() {
+
+        List<User> allUsers = userService.findByRole("organizer");
+        List<UserResponse> userResponses = new ArrayList<>();
+
+        for(User u : allUsers) {
+            userResponses.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(),u.getPhoneNumber(),u.getAddress(), u.getRole(), u.getStatus()));
+        }
+        return userResponses;
     }
 
     @PostMapping
