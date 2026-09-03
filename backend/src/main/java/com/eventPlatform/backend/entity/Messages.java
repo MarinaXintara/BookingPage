@@ -26,6 +26,9 @@ public class Messages {
     @Column(nullable = false)
     private String message;
 
+    @Column(nullable = false)
+    private String status;
+
     public Long getId() {
         return id;
     }
@@ -72,5 +75,13 @@ public class Messages {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

@@ -29,6 +29,7 @@ public class MessageController {
 
     @PostMapping
     public Messages createMessages(@RequestBody Messages messages) {
+        messages.setStatus("UNREAD");
         return messagesService.saveMessages(messages);
     }
 
@@ -48,6 +49,15 @@ public class MessageController {
         }
         Long userId = Long.parseLong(authentication.getName());
         return messagesService.getMessagesByRecipientId(userId);
+    }
+
+    @GetMapping("/getAllReadMessages")
+    public List<Messages> getAllReadMessages(Authentication authentication) {
+        if(authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Not logged in");
+        }
+        Long userId = Long.parseLong(authentication.getName());
+        return messagesService.getMessagesByRecipientIdAndStatus(userId , "READ");
     }
 
 }
