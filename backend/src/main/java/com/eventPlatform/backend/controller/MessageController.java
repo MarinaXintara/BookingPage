@@ -7,10 +7,7 @@ import com.eventPlatform.backend.service.EventService;
 import com.eventPlatform.backend.service.MessagesService;
 import com.eventPlatform.backend.service.UserService;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -58,6 +55,15 @@ public class MessageController {
         }
         Long userId = Long.parseLong(authentication.getName());
         return messagesService.getMessagesByRecipientIdAndStatus(userId , "READ");
+    }
+
+    @DeleteMapping("/deleteMessage")
+    public void deleteMessages(Authentication authentication, Messages message) {
+        if(authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Not logged in");
+        }
+        Long messagesId = message.getId();
+        messagesService.deleteMessage(messagesId);
     }
 
 }
