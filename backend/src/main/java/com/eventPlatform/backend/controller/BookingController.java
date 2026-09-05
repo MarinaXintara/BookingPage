@@ -62,9 +62,6 @@ public class BookingController {
         return bookingService.createBooking(request, userId);
     }
 
-//    @PatchMapping("/editBooking")
-//    public Booking editEvent(@RequestBody Booking booking) {
-//    }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<Booking> editBookingStatus(@PathVariable Long id, @RequestBody BookingStatus bookingStatus, Authentication authentication) {

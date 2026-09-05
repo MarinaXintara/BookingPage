@@ -40,7 +40,12 @@ export async function getInbox(signal?: AbortSignal): Promise<Message[]> {
       signal,
     });
   
-  return response.json();
+  if (!response.ok) {
+    throw new Error(`Failed to fetch inbox: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
 
 }
 export async function getSentMessages(signal?: AbortSignal): Promise<Message[]> {
@@ -51,8 +56,14 @@ export async function getSentMessages(signal?: AbortSignal): Promise<Message[]> 
       signal,
     });
   
-  return response.json();
+  if (!response.ok) {
+    throw new Error(`Failed to fetch sent messages: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
 }
+
 
 export async function getRecipients(signal?: AbortSignal): Promise<MessageContact[]> {
 
@@ -63,9 +74,15 @@ export async function getRecipients(signal?: AbortSignal): Promise<MessageContac
       signal,
     });
   
-  return response.json();
+ if (!response.ok) {
+    throw new Error(`Failed to fetch recipients: ${response.statusText}`);
+  }
 
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
 }
+
+
 
 
 
@@ -83,7 +100,13 @@ export async function sendMessage(data: SendMessageInput,signal?: AbortSignal): 
       signal,
     });
 
-    return response.json();
+    if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || "Could not send message.");
+  }
+  
+
+  return response.json();
   
 }  
 
