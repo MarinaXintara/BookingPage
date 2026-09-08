@@ -98,19 +98,18 @@ export default function UsersPage() {
                     <th scope="col">Email</th>
                     <th scope="col">Role</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Registered</th>
                   </tr>
                 </thead>
                 <tbody>
                   {visibleUsers.map((user) => {
-                    
+
                     return (
                       <tr key={user.id}>
                         <th scope="row"><Link to={`/users/${user.id}`}>{user.firstName} {user.lastName}</Link></th>
                         <td><a href={`mailto:${user.email}`}>{user.email}</a></td>
                         <td>{user.role}</td>
                         <td>{user.status}</td>
-                        
+
                       </tr>
                     );
                   })}

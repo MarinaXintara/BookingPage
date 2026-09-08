@@ -1,13 +1,7 @@
+import type { User } from "../UsersPage/userApi";
 
 
 export type MessageFolder = "inbox" | "sent";
-
-export interface MessageContact {
-  userId: number;
-  name: string;
-  eventId: number;
-  eventTitle: string;
-}
 
 export interface Message {
   id: string;
@@ -25,7 +19,6 @@ export interface Message {
 
 export interface SendMessageInput {
   receiverId: number;
-  eventId: number;
   subject: string;
   body: string;
 }
@@ -65,7 +58,7 @@ export async function getSentMessages(signal?: AbortSignal): Promise<Message[]> 
 }
 
 
-export async function getRecipients(signal?: AbortSignal): Promise<MessageContact[]> {
+export async function getRecipients(signal?: AbortSignal): Promise<User[]> {
 
   const response = await fetch("http://localhost:8080/api/users/getUsersForMessages",
     {
