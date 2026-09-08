@@ -1,18 +1,17 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
-import type { Role } from "../../Auth/Authentication";
+import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../../Auth/useAuth";
 import Button from "../../components/Button";
+import type { User } from "../UsersPage/userApi";
 import {
   deleteMessage,
   getInbox,
+  getRecipients,
   getSentMessages,
   markMessageAsRead,
   sendMessage,
   type Message,
-  type MessageContact,
   type MessageFolder,
   type SendMessageInput,
-  getRecipients,
 } from "./messagingApi";
 
 
@@ -70,7 +69,7 @@ function MessageList({ folder, messages, selectedId, onSelect }: MessageListProp
 }
 
 interface MessageFormProps {
-  contacts: MessageContact[];
+  contacts: User[];
   draft: ComposeDraft;
   isSending: boolean;
   onCancel: () => void;
@@ -78,27 +77,12 @@ interface MessageFormProps {
 }
 
 function MessageForm({ contacts, draft, isSending, onCancel, onSend }: MessageFormProps) {
-  const initialContact = contacts.find((contact) => (
-    contact.eventId === draft.eventId && contact.userId === draft.receiverId
-  )) ?? contacts[0];
-  const [eventId, setEventId] = useState(draft.eventId ?? initialContact?.eventId ?? 0);
-  const [receiverId, setReceiverId] = useState(draft.receiverId ?? initialContact?.userId ?? 0);
+  const [receiverId, setReceiverId] = useState(draft.receiverId ?? 0);
   const [subject, setSubject] = useState(draft.subject ?? "");
   const [body, setBody] = useState("");
   const [validationError, setValidationError] = useState("");
+  const selectedContact = contacts.find((contact) => contact.id === receiverId);
 
-  const events = useMemo(() => {
-    const eventNames = new Map<number, string>();
-    contacts.forEach((contact) => eventNames.set(contact.eventId, contact.eventTitle));
-    return Array.from(eventNames, ([id, title]) => ({ id, title }));
-  }, [contacts]);
-  const recipients = contacts.filter((contact) => contact.eventId === eventId);
-  const selectedContact = recipients.find((contact) => contact.userId === receiverId);
-
-  function changeEvent(nextEventId: number) {
-    setEventId(nextEventId);
-    setReceiverId(contacts.find((contact) => contact.eventId === nextEventId)?.userId ?? 0);
-  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -110,8 +94,7 @@ function MessageForm({ contacts, draft, isSending, onCancel, onSend }: MessageFo
     }
 
     await onSend({
-      receiverId: selectedContact.userId,
-      eventId: selectedContact.eventId,
+      receiverId: selectedContact.id,
       subject: subject.trim(),
       body: body.trim(),
     });
@@ -132,21 +115,13 @@ function MessageForm({ contacts, draft, isSending, onCancel, onSend }: MessageFo
       <h2>{draft.isReply ? "Reply" : "New message"}</h2>
       <form className="form" onSubmit={handleSubmit}>
         {draft.isReply && selectedContact ? (
-          <p className="page-message">To {selectedContact.name} about {selectedContact.eventTitle}</p>
+          <p className="page-message">To {selectedContact.firstName} {selectedContact.lastName}</p>
         ) : (
-          <div className="form-row">
-            <div className="form-field">
-              <label htmlFor="message-event">Event</label>
-              <select id="message-event" value={eventId} onChange={(event) => changeEvent(Number(event.target.value))}>
-                {events.map((event) => <option key={event.id} value={event.id}>{event.title}</option>)}
-              </select>
-            </div>
-            <div className="form-field">
-              <label htmlFor="message-recipient">Recipient</label>
-              <select id="message-recipient" value={receiverId} onChange={(event) => setReceiverId(Number(event.target.value))}>
-                {recipients.map((contact) => <option key={contact.userId} value={contact.userId}>{contact.name}</option>)}
-              </select>
-            </div>
+          <div className="form-field">
+            <label htmlFor="message-recipient">Recipient</label>
+            <select id="message-recipient" value={receiverId} onChange={(event) => setReceiverId(Number(event.target.value))}>
+              {contacts.map((contact) => <option key={contact.id} value={contact.id}>{contact.firstName} {contact.lastName}</option>)}
+            </select>
           </div>
         )}
         <div className="form-field">
@@ -169,11 +144,10 @@ function MessageForm({ contacts, draft, isSending, onCancel, onSend }: MessageFo
 
 export default function Messaging() {
   const { user } = useAuth();
-  const role: Role | null = user?.role ?? null;
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [inbox, setInbox] = useState<Message[]>([]);
   const [sent, setSent] = useState<Message[]>([]);
-  const [contacts, setContacts] = useState<MessageContact[]>([]);
+  const [contacts, setContacts] = useState<User[]>([]);
   const [activeFolder, setActiveFolder] = useState<MessageFolder>("inbox");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [composeDraft, setComposeDraft] = useState<ComposeDraft | null>(null);
@@ -183,7 +157,7 @@ export default function Messaging() {
   const [loadAttempt, setLoadAttempt] = useState(0);
 
   useEffect(() => {
-    if (!role) return;
+    if (!user) return;
     const controller = new AbortController();
     setStatus("loading");
 
@@ -207,10 +181,9 @@ export default function Messaging() {
       });
 
     return () => controller.abort();
-  }, [role, loadAttempt]);
+  }, [user, loadAttempt]);
 
-  if (!role) return null;
-  
+  if (!user) return null;
 
   const messages = activeFolder === "inbox" ? inbox : sent;
   const selectedMessage = messages.find((message) => message.id === selectedId);
@@ -232,7 +205,7 @@ export default function Messaging() {
 
     setInbox((current) => current.map((item) => item.id === message.id ? { ...item, isRead: true } : item));
     try {
-      await markMessageAsRead( message.id);
+      await markMessageAsRead(message.id);
     } catch {
       setInbox((current) => current.map((item) => item.id === message.id ? { ...item, isRead: false } : item));
       setFeedback({ type: "error", text: "Could not mark the message as read." });
@@ -289,7 +262,12 @@ export default function Messaging() {
   return (
     <main className="page">
       <header className="page-header">
-        <div><h1>Messaging</h1><p>Messages connected to your events and bookings.</p></div>
+        <div>
+          <h1>Messaging</h1>
+          {user.role === 'ADMIN' ? <p>Connect with other admins, organizers and users.</p>
+            : user.role === 'ORGANIZER' ? <p>Connect with admins and users.</p>
+              : <p>Connect with admins and organizers.</p>}
+        </div>
         <Button onClick={() => { setComposeDraft({}); setFeedback(null); }}>New message</Button>
       </header>
       {feedback ? <p className={`page-message page-message--${feedback.type}`} role={feedback.type === "error" ? "alert" : "status"}>{feedback.text}</p> : null}

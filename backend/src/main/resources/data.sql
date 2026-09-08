@@ -12,7 +12,7 @@ BEGIN;
 -- Users
 
 INSERT INTO users
-    (id, first_name, last_name, email, password, phone_number, address, tin, role)
+    (id, first_name, last_name, email, password, phone_number, address, tin, role, status)
 VALUES
     (
         1,
@@ -23,7 +23,8 @@ VALUES
         '+30 210 000 0001',
         '1 Admin Street, Athens',
         '100000001',
-        'ADMIN'
+        'ADMIN',
+        'APPROVED'
     ),
     (
         2,
@@ -34,7 +35,8 @@ VALUES
         '+30 210 000 0002',
         '25 Event Avenue, Athens',
         '100000002',
-        'ORGANIZER'
+        'ORGANIZER',
+        'APPROVED'
     ),
     (
         3,
@@ -45,7 +47,8 @@ VALUES
         '+30 210 000 0003',
         '9 Ermou Street, Athens',
         '100000003',
-        'USER'
+        'USER',
+        'APPROVED'
     ),
     (
         4,
@@ -56,7 +59,8 @@ VALUES
         '+30 210 000 0004',
         '14 Tsimiski Street, Thessaloniki',
         '100000004',
-        'USER'
+        'USER',
+        'PENDING'
     )
 ON CONFLICT (id) DO NOTHING;
 
