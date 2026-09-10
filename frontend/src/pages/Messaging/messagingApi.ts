@@ -1,7 +1,7 @@
 import type { User } from "../UsersPage/userApi";
 
 
-export type MessageFolder = "inbox" | "sent";
+export type MessageFolder = "inbox" | "outbox";
 
 export interface Message {
   id: string;
