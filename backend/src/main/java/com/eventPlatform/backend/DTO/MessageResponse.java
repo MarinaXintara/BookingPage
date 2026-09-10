@@ -1,4 +1,5 @@
 package com.eventPlatform.backend.DTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MessageResponse {
     private Long id;
@@ -8,6 +9,7 @@ public class MessageResponse {
     private String receiverName;
     private String subject;
     private String body;
+    @JsonProperty("isRead")
     private boolean isRead;
     private String createdAt;
 
@@ -60,7 +62,7 @@ public class MessageResponse {
     public void setBody(String body) {
         this.body = body;
     }
-
+    @JsonProperty("isRead")
     public void setRead(boolean read) {
         isRead = read;
     }
@@ -96,7 +98,7 @@ public class MessageResponse {
     public String getBody() {
         return body;
     }
-
+    @JsonProperty("isRead")
     public boolean isRead() {
         return isRead;
     }

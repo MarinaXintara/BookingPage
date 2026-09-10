@@ -16,7 +16,6 @@ import {
 
 
 interface ComposeDraft {
-  eventId?: number;
   receiverId?: number;
   subject?: string;
   isReply?: boolean;
@@ -44,6 +43,7 @@ function MessageList({ folder, messages, selectedId, onSelect }: MessageListProp
   return (
     <div className="message-list">
       {messages.map((message) => {
+        console.log(message)
         const contact = folder === "inbox" ? message.senderName : message.receiverName;
         return (
           <button
@@ -218,7 +218,7 @@ export default function Messaging() {
     try {
       const newMessage = await sendMessage(input);
       setSent((current) => [newMessage, ...current]);
-      setActiveFolder("sent");
+      setActiveFolder("outbox");
       setSelectedId(newMessage.id);
       setComposeDraft(null);
       setFeedback({ type: "success", text: "Message sent." });
@@ -276,7 +276,7 @@ export default function Messaging() {
         <aside className="messaging-sidebar" aria-label="Message folders">
           <div className="message-tabs">
             <button className={`tab${activeFolder === "inbox" ? " tab--active" : ""}`} type="button" onClick={() => selectFolder("inbox")}>Inbox{unreadCount ? ` (${unreadCount})` : ""}</button>
-            <button className={`tab${activeFolder === "sent" ? " tab--active" : ""}`} type="button" onClick={() => selectFolder("sent")}>Sent</button>
+            <button className={`tab${activeFolder === "outbox" ? " tab--active" : ""}`} type="button" onClick={() => selectFolder("outbox")}>Outbox</button>
           </div>
           <MessageList folder={activeFolder} messages={messages} selectedId={selectedId} onSelect={(message) => { void selectMessage(message); }} />
         </aside>
@@ -293,7 +293,7 @@ export default function Messaging() {
             />
           ) : selectedMessage ? (
             <article>
-              <p className="muted">{selectedMessage.eventTitle}</p>
+              
               <h2>{selectedMessage.subject}</h2>
               <div className="message-meta">
                 <span>{activeFolder === "inbox" ? "From" : "To"}: {activeFolder === "inbox" ? selectedMessage.senderName : selectedMessage.receiverName}</span>
@@ -301,7 +301,7 @@ export default function Messaging() {
               </div>
               <p className="message-body">{selectedMessage.body}</p>
               <div className="page-actions">
-                {activeFolder === "inbox" ? <Button onClick={() => setComposeDraft({ eventId: selectedMessage.eventId, receiverId: selectedMessage.senderId, subject: `Re: ${selectedMessage.subject.replace(/^Re:\s*/i, "")}`, isReply: true })}>Reply</Button> : null}
+                {activeFolder === "inbox" ? <Button onClick={() => setComposeDraft({ receiverId: selectedMessage.senderId, subject: `Re: ${selectedMessage.subject.replace(/^Re:\s*/i, "")}`, isReply: true })}>Reply</Button> : null}
                 <Button variant="danger" disabled={isDeleting} onClick={() => { void handleDelete(); }}>{isDeleting ? "Deleting..." : "Delete"}</Button>
               </div>
             </article>
