@@ -13,16 +13,12 @@ public class Messages {
     private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "event_id")
-    private Event event;
-
-    @ManyToOne
     @JoinColumn(name = "recipient_id", nullable = false)
     private User recipient;
 
     private String subject;
 
-    @Lob
+
     @Column(nullable = false)
     private String message;
 
@@ -45,14 +41,6 @@ public class Messages {
 
     public void setSender(User sender) {
         this.sender = sender;
-    }
-
-    public Event getEvent() {
-        return event;
-    }
-
-    public void setEvent(Event event) {
-        this.event = event;
     }
 
     public User getRecipient() {
