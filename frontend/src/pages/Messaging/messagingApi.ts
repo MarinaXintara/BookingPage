@@ -9,8 +9,6 @@ export interface Message {
   senderName: string;
   receiverId: number;
   receiverName: string;
-  eventId: number;
-  eventTitle: string;
   subject: string;
   body: string;
   isRead: boolean;
