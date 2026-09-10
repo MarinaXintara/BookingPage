@@ -6,6 +6,7 @@ import {
     updateBookingStatus,
 } from "./bookingApi";
 import { fetchEvents, type Event } from "../EventPage/eventApi";
+import Button from "../../components/Button";
 
 interface BookingRow extends Booking {
     event: Event | null;
@@ -113,18 +114,35 @@ export default function OrganiserBookings() {
                                     <td>{booking.numberOfTickets}</td>
                                     <td>{currencyFormatter.format(booking.totalCost)}</td>
                                     <td>
-                                        <select
-                                            value={booking.bookingStatus}
-                                            disabled={updatingBookingId === booking.id}
-                                            onChange={(event) => handleStatusChange(
-                                                booking,
-                                                event.target.value as BookingStatus,
+                                        <td>
+                                            {booking.bookingStatus === "PENDING" && (
+                                                <>
+                                                    <Button
+                                                        type="button"
+                                                        onClick={() => handleStatusChange(booking, "CONFIRMED")}
+                                                        disabled={updatingBookingId === booking.id}
+                                                    >
+                                                        Confirm
+                                                    </Button>
+
+                                                    <Button
+                                                        type="button"
+                                                        onClick={() => handleStatusChange(booking, "CANCELLED")}
+                                                        disabled={updatingBookingId === booking.id}
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                </>
                                             )}
-                                        >
-                                            <option value="PENDING">Pending</option>
-                                            <option value="CONFIRMED">Confirmed</option>
-                                            <option value="CANCELLED">Cancelled</option>
-                                        </select>
+
+                                            {booking.bookingStatus === "CONFIRMED" && (
+                                                 <span>Confirmed</span>
+                                            )}    
+
+                                            {booking.bookingStatus === "CANCELLED" && (
+                                                <span>Cancelled</span>
+                                            )}
+                                        </td>
                                     </td>
                                 </tr>
                             ))}
