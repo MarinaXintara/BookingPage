@@ -5,7 +5,6 @@ import com.eventPlatform.backend.entity.Media;
 import com.eventPlatform.backend.service.EventService;
 import com.eventPlatform.backend.service.FileStorageService;
 
-import com.eventPlatform.backend.service.RecommendationService;
 
 import jakarta.transaction.Transactional;
 
@@ -29,7 +28,6 @@ import com.eventPlatform.backend.service.JsonExportService;
 public class EventController {
 
     private final EventService eventService;
-    private final RecommendationService recommendationService;
     private final FileStorageService fileStorageService;
     private final XmlExportService xmlExportService;
     private final JsonExportService jsonExportService;
@@ -37,7 +35,6 @@ public class EventController {
     public EventController(
             EventService eventService,
             FileStorageService fileStorageService,
-            RecommendationService recommendationService,
             XmlExportService xmlExportService,
             JsonExportService jsonExportService
     ) {
@@ -45,7 +42,6 @@ public class EventController {
 
             this.eventService = eventService;
             this.fileStorageService = fileStorageService;
-            this.recommendationService = recommendationService;
             this.xmlExportService = xmlExportService;
             this.jsonExportService = jsonExportService;
 
@@ -212,7 +208,6 @@ public class EventController {
     @Transactional
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
 
-        recommendationService.deleteEventRecommendations(id);
         eventService.deleteEvent(id);
 
         return ResponseEntity.noContent().build();
