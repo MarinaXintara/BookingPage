@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../Auth/useAuth";
 import { useFetchEvent } from "../../components/helper";
 import EventMap from "../../OpenStreetMap/loadMap";
-import { recordEventView } from "../HomePage/recommendationApi";
+
 import DeleteButton from "../OrganiseEvent/DeleteEvent/DeleteButton";
 
 export default function EventDetailsPage() {
@@ -17,7 +17,7 @@ export default function EventDetailsPage() {
     if (!currentUserId || !loadedEventId) return;
 
     const controller = new AbortController();
-    void recordEventView(loadedEventId, controller.signal).catch(() => undefined);
+    
 
     return () => controller.abort();
   }, [currentUserId, loadedEventId]);
