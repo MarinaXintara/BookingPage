@@ -21,6 +21,7 @@
    Μην επιστρεφεις απευθειας το `User` entity. Φτιαξε DTO, π.χ. `UserResponse`, χωρις `password`.
 
 5. **Διαλεξε auth τροπο** done
+https://github.com/bbarbs/spring-boot-jwt/tree/master/src/main/java/com/auth/core
    https://medium.com/@haflan395/complete-guide-to-implementing-jwt-authentication-with-cookies-and-local-storage-in-react-and-dc9225fe259b
    Η πιο καθαρη λυση για αυτο το app:
 
