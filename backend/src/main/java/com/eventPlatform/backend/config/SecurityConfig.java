@@ -30,7 +30,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/events/**").permitAll()
                 .requestMatchers("/api/Booking/**").permitAll()
                 .requestMatchers("/api/messages/**").permitAll()
-                .requestMatchers("/api/users/**").permitAll() //use later hasRole("ADMIN")
+                .requestMatchers("/api/users/**").permitAll()
+                                .requestMatchers("/api/recommendation/**").permitAll() //use later hasRole("ADMIN")
                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(

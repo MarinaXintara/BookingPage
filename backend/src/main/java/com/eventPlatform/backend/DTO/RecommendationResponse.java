@@ -6,6 +6,12 @@ public class RecommendationResponse {
     private String title;
     private Double score;
 
+    public RecommendationResponse(Long eventId, String title, Double score) {
+        this.eventId = eventId;
+        this.title = title;
+        this.score = score;
+    }
+
     public  Long getEventId() {
         return eventId;
     }

@@ -3,6 +3,7 @@ package com.eventPlatform.backend.service;
 import com.eventPlatform.backend.DTO.Interaction;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,9 +28,14 @@ public class MatrixFactorizationService {
     private double[] userBias;
     private double[] eventBias;
 
+    private Map<Long, List<Interaction>> userInteractions = new HashMap<>();
+
     private double globalBias;
 
-
+    @PostConstruct
+    public void initialize() {
+        trainModel();
+    }
 
     private void createIndexes(List<Interaction> interactions) {
 
@@ -73,7 +79,15 @@ public class MatrixFactorizationService {
             String line;
             while ((line = reader.readLine()) != null) {
 
-                String[] values = line.split(",");
+                String[] values = line.split(",", -1);
+
+                if (values.length < 6) {
+                    continue;
+                }
+
+                if (values[0].isEmpty() || values[1].isEmpty()) {
+                    continue;
+                }
 
                 Long userId = Long.parseLong(values[0]);
                 Long eventId = Long.parseLong(values[1]);
@@ -110,8 +124,9 @@ public class MatrixFactorizationService {
         return interactions;
     } //περναω τα data απο τα csv σε List με Interactions DTO
 
-
-//    public buildInteractions(){}
+    public boolean hasEvent(Long eventId) {
+        return eventIndex.containsKey(eventId);
+    }
 
     private void initializeModel() {
 
@@ -138,10 +153,267 @@ public class MatrixFactorizationService {
             }
         }
     }
+    
+    public double calculateGlobalBias(List<Interaction> interactions){
+        double N = interactions.size();
+        double sum = 0;
+        for  (Interaction interaction : interactions) {
+            sum += interaction.getPreference();
+        }
 
-//    public train(){}
+        return sum/N;
+    }
 
-//    public predict(Long userId, Long eventId){}
+    public void train(List<Interaction> interactions){
+        double learningRate = 0.01;  //α
+        double regularization = 0.02; //λ
+        int epochs = 20;
+        globalBias = calculateGlobalBias(interactions);
+        for (int v = 0; v < epochs; v++) {
 
+            for (Interaction interaction : interactions) {
+                Long curUserId = interaction.getUserId();
+                Long curEventId = interaction.getEventId();
+
+                int u = userIndex.get(curUserId);
+                int i = eventIndex.get(curEventId);
+                Double r = interaction.getPreference(); //preference
+
+                double notR = predict(interaction.getUserId(), interaction.getEventId()); //prediction
+                double error = r - notR;
+
+                userBias[u] += learningRate*(error - regularization*userBias[u]);
+                eventBias[i] += learningRate*(error - regularization*eventBias[i]);
+                for (int k = 0; k < factors; k++) {
+                    double oldUserFactor = userFactors[u][k];
+                    double oldEventFactor = eventFactors[i][k];
+                    userFactors[u][k] += learningRate*(error*oldEventFactor- regularization*oldUserFactor);
+                    eventFactors[i][k] += learningRate*(error*oldUserFactor - regularization*oldEventFactor);
+                }
+
+            }
+        }
+
+    }
+
+    public double predict(Long userId, Long eventId){
+        double prediction = 0.0;
+
+        double μ= globalBias;
+        double dotProduct = 0.0;
+        //int u = userIndex.get(userId);
+        //int i = eventIndex.get(eventId);
+
+        Integer uIndex = userIndex.get(userId);
+        if (uIndex == null) {
+            System.out.println(
+                    "PROBLEM -> userId = " + userId +
+                            ", userIndex = " + uIndex
+            );
+            return 0.0;
+        }
+        int u= uIndex;
+
+        Integer iIndex = eventIndex.get(eventId);
+        if (iIndex == null) {
+            System.out.println(
+                    "PROBLEM -> eventId = " + eventId +
+                            ", eventIndex = " + iIndex
+            );
+            return 0.0;
+        }
+        int i = iIndex;
+
+        double bu = userBias[u];
+        double bi = eventBias[i];
+
+        for (int k=0;k < factors;k++){
+            dotProduct += userFactors[u][k] * eventFactors[i][k];
+        }
+        prediction = μ + bu + bi + dotProduct;
+        return prediction;
+    }
+
+    public void trainModel() {
+
+        List<Interaction> interactions = loadTrainingData();
+
+        createIndexes(interactions);
+
+        for (Interaction interaction : interactions) {
+            userInteractions.computeIfAbsent(interaction.getUserId(), k -> new ArrayList<>()).add(interaction);
+        }
+
+        initializeModel();
+
+        train(interactions);
+    }
+
+    public List<Double> getEventFeatures(Long eventId) {
+
+        List<Double> features = new ArrayList<>();
+
+        try {
+            InputStream inputStream = getClass()
+                    .getClassLoader()
+                    .getResourceAsStream("recommender/events.csv");
+
+            if (inputStream == null) {
+                throw new RuntimeException("events.csv not found");
+            }
+
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(inputStream)
+            );
+
+            reader.readLine();
+
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+
+                String[] values = line.split(",", -1);
+
+                if (values.length < 109) {
+                    continue;
+                }
+
+                if (values[0].isEmpty()) {
+                    continue;
+                }
+
+                Long currentEventId;
+
+                try {
+                    currentEventId = Long.parseLong(values[0]);
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+
+                if (!currentEventId.equals(eventId)) {
+                    continue;
+                }
+
+                for (int i = 9; i <= 108; i++) {
+
+                    if (values[i].isEmpty()) {
+                        features.add(0.0);
+                    } else {
+                        features.add(Double.parseDouble(values[i]));
+                    }
+                }
+
+                break;
+            }
+
+            reader.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "Error loading event features",
+                    e
+            );
+        }
+
+        return features;
+    }
+
+    public Map<Long, List<Double>> getEventFeatures(List<Long> eventIds) {
+
+        Map<Long, List<Double>> eventFeaturesMap = new HashMap<>();
+
+        if (eventIds == null || eventIds.isEmpty()) {
+            return eventFeaturesMap;
+        }
+
+        for (Long eventId : eventIds) {
+            eventFeaturesMap.put(eventId, new ArrayList<>());
+        }
+
+        try {
+            InputStream inputStream = getClass()
+                    .getClassLoader()
+                    .getResourceAsStream("recommender/events.csv");
+
+            if (inputStream == null) {
+                throw new RuntimeException("events.csv not found");
+            }
+
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(inputStream)
+            );
+
+            reader.readLine();
+
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+
+                String[] values = line.split(",", -1);
+
+                if (values.length < 109) {
+                    continue;
+                }
+
+                if (values[0].isEmpty()) {
+                    continue;
+                }
+
+                Long currentEventId;
+
+                try {
+                    currentEventId = Long.parseLong(values[0]);
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+
+                if (!eventFeaturesMap.containsKey(currentEventId)) {
+                    continue;
+                }
+
+                List<Double> features = new ArrayList<>();
+
+                for (int i = 9; i <= 108; i++) {
+
+                    if (values[i].isEmpty()) {
+                        features.add(0.0);
+                    } else {
+                        features.add(Double.parseDouble(values[i]));
+                    }
+                }
+
+                eventFeaturesMap.put(currentEventId, features);
+
+                boolean allFound = true;
+
+                for (List<Double> eventFeatures : eventFeaturesMap.values()) {
+                    if (eventFeatures.isEmpty()) {
+                        allFound = false;
+                        break;
+                    }
+                }
+
+                if (allFound) {
+                    break;
+                }
+            }
+
+            reader.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "Error loading event features",
+                    e
+            );
+        }
+
+        return eventFeaturesMap;
+    }
+
+    public List<Interaction> getUserInteractions(Long userId) {
+        return userInteractions.getOrDefault(userId, new ArrayList<>());
+    }
+
+    //    public buildInteractions(){}
 }
 

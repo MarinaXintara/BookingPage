@@ -1,6 +1,7 @@
 package com.eventPlatform.backend.controller;
 
 import com.eventPlatform.backend.DTO.RecommendationResponse;
+import com.eventPlatform.backend.service.RecommendationService;
 import com.eventPlatform.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +15,10 @@ import java.util.List;
 @RequestMapping("/api/recommendation")
 public class RecommendationController {
     private final UserService userService;
-    public RecommendationController(UserService userService) {
+    private final RecommendationService recommendationService;
+    public RecommendationController(UserService userService, RecommendationService recommendationService) {
         this.userService = userService;
+        this.recommendationService = recommendationService;
     }
 
     @GetMapping("/recommendations")
@@ -26,6 +29,6 @@ public class RecommendationController {
 
         Long userId = Long.parseLong(authentication.getName());
 
-        return null;
+        return recommendationService.getRecommendations(userId);
     }
 }

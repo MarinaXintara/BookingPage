@@ -1,33 +1,39 @@
 package com.eventPlatform.backend.service;
 
 import com.eventPlatform.backend.DTO.RecommendationResponse;
+import com.eventPlatform.backend.DTO.ScoredEvent;
 import com.eventPlatform.backend.entity.Booking;
 import com.eventPlatform.backend.entity.Event;
 import com.eventPlatform.backend.repository.BookingRepository;
 import com.eventPlatform.backend.repository.EventRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class RecommendationService {
     private final BookingRepository bookingRepository;
     private final EventRepository eventRepository;
     private final MatrixFactorizationService matrixFactorizationService;
+    private final ColdStartService coldStartService;
+
+    private int N =10; //top events
 
     public RecommendationService(BookingRepository bookingRepository,
                                  EventRepository eventRepository,
-                                 MatrixFactorizationService matrixFactorizationService) {
+                                 MatrixFactorizationService matrixFactorizationService,
+                                 ColdStartService coldStartService) {
         this.bookingRepository = bookingRepository;
         this.eventRepository = eventRepository;
         this.matrixFactorizationService = matrixFactorizationService;
+        this.coldStartService = coldStartService;
     }
 
     public List<RecommendationResponse> getRecommendations(Long userId) {
-        List<Event> visitedEvents = getUserHistory(userId);
+        List<Event> candidateEvents = getCandidateEvents(userId);
+        List<ScoredEvent> scoredEvents = calculateScores(userId,candidateEvents);
 
-        return null;
+        return createRecommendations(scoredEvents);
     }
 
     public List<Event> getUserHistory(Long userId){
@@ -62,11 +68,54 @@ public class RecommendationService {
         return candidateEvents;
     }
 
-    public List<Double> calculateScores(Long userId,List<Event>candidateEvents){
-        return null;
+    public List<ScoredEvent> calculateScores(Long userId, List<Event> candidateEvents) {
+
+        List<ScoredEvent> scores = new ArrayList<>();
+
+        List<Double> userProfile = coldStartService.createUserProfile(userId);
+
+        List<Long> coldStartEventIds = new ArrayList<>();
+
+        for (Event event : candidateEvents) {
+
+            if (!matrixFactorizationService.hasEvent(event.getId())) {
+                coldStartEventIds.add(event.getId());
+            }
+        }
+
+        Map<Long, List<Double>> coldStartFeatures = matrixFactorizationService.getEventFeatures(coldStartEventIds);
+
+        for (Event event : candidateEvents) {
+
+            double score;
+
+            if (matrixFactorizationService.hasEvent(event.getId())) {
+
+                score = matrixFactorizationService.predict(userId, event.getId());
+
+            } else {
+                System.out.println("COLD START -> userId = " + userId + ", eventId = " + event.getId());
+
+                List<Double> eventFeatures = coldStartFeatures.get(event.getId());
+
+                score = coldStartService.calculateColdStartScore(userProfile, eventFeatures);
+            }
+
+            ScoredEvent temp = new ScoredEvent(event, score);
+            scores.add(temp);
+        }
+
+        return scores;
     }
 
-//    public createRecommendations(List<Double >scoredEvents){
-//        return null;
-//    }
+    public List<RecommendationResponse> createRecommendations(List<ScoredEvent>scoredEvents){
+        scoredEvents.sort(Comparator.comparing((ScoredEvent scoredEvent) ->scoredEvent.getScore()).reversed());
+        List<RecommendationResponse> recommendationResponses = new ArrayList<>();
+        for(int i=0;i < N && i < scoredEvents.size();i++){
+            RecommendationResponse temp = new RecommendationResponse(scoredEvents.get(i).getEvent().getId(),scoredEvents.get(i).getEvent().getTitle(), scoredEvents.get(i).getScore());
+            recommendationResponses.add(temp);
+
+        }
+        return recommendationResponses;
+    }
 }
