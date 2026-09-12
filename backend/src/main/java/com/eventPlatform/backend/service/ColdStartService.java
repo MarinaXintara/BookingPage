@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static java.lang.Math.sqrt;
 
+//a service worth killing myself for
 @Service
 public class ColdStartService {
 
