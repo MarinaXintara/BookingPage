@@ -1,5 +1,6 @@
 package com.eventPlatform.backend.service;
 
+import com.eventPlatform.backend.DTO.RecommendationFlag;
 import com.eventPlatform.backend.DTO.RecommendationResponse;
 import com.eventPlatform.backend.DTO.ScoredEvent;
 import com.eventPlatform.backend.entity.Booking;
@@ -72,12 +73,11 @@ public class RecommendationService {
 
         List<ScoredEvent> scores = new ArrayList<>();
 
-        List<Double> userProfile = coldStartService.createUserProfile(userId);
-
+        RecommendationFlag userProfile = coldStartService.createUserProfile(userId);
+        int flag = userProfile.getFlag();
         List<Long> coldStartEventIds = new ArrayList<>();
 
         for (Event event : candidateEvents) {
-
             if (!matrixFactorizationService.hasEvent(event.getId())) {
                 coldStartEventIds.add(event.getId());
             }
@@ -85,20 +85,49 @@ public class RecommendationService {
 
         Map<Long, List<Double>> coldStartFeatures = matrixFactorizationService.getEventFeatures(coldStartEventIds);
 
-        for (Event event : candidateEvents) {
+        List<Long> allCandidateEventIds = new ArrayList<>();
 
+        for (Event event : candidateEvents) {
+            allCandidateEventIds.add(event.getId());
+        }
+
+        Map<Long, List<Double>> allCandidateFeatures = matrixFactorizationService.getEventFeatures(allCandidateEventIds);
+
+        for (Event event : candidateEvents) {
             double score;
 
-            if (matrixFactorizationService.hasEvent(event.getId())) {
+            if(flag  ==1) {
+                //has bookings
+                if (matrixFactorizationService.hasEvent(event.getId())&& matrixFactorizationService.hasUser(userId)) {
+                    double mfScore = matrixFactorizationService.predict(userId, event.getId());
+                    score = mfScore;
+                }else {
+                    List<Double> eventFeatures = allCandidateFeatures.get(event.getId());
+                    score = coldStartService.calculateColdStartScore(userProfile.getUserProfile(), eventFeatures);
+                }
 
-                score = matrixFactorizationService.predict(userId, event.getId());
+            }else if(flag ==2){
+                //has event visits
+                List<Double> eventFeatures = allCandidateFeatures.get(event.getId());
+                score = coldStartService.calculateColdStartScore(userProfile.getUserProfile(), eventFeatures);
+            }else if(flag ==3){
+                //has none
+                if (matrixFactorizationService.hasEvent(event.getId())&& matrixFactorizationService.hasUser(userId)) {
+                    score = matrixFactorizationService.predict(userId, event.getId());
+                } else {
+                    List<Double> eventFeatures = coldStartFeatures.get(event.getId());
+                    score = coldStartService.calculateColdStartScore(userProfile.getUserProfile(), eventFeatures);
+                }
 
-            } else {
-                System.out.println("COLD START -> userId = " + userId + ", eventId = " + event.getId());
+            }else{
+                //error case
+                if (matrixFactorizationService.hasEvent(event.getId())&& matrixFactorizationService.hasUser(userId) ) {
+                    score = matrixFactorizationService.predict(userId, event.getId());
+                } else {
+                    List<Double> eventFeatures = coldStartFeatures.get(event.getId());
+                    score = coldStartService.calculateColdStartScore(userProfile.getUserProfile(), eventFeatures);
+                }
 
-                List<Double> eventFeatures = coldStartFeatures.get(event.getId());
-
-                score = coldStartService.calculateColdStartScore(userProfile, eventFeatures);
             }
 
             ScoredEvent temp = new ScoredEvent(event, score);

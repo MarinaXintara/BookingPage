@@ -2,28 +2,25 @@ package com.eventPlatform.backend.controller;
 
 import com.eventPlatform.backend.entity.Event;
 import com.eventPlatform.backend.entity.Media;
-import com.eventPlatform.backend.service.EventService;
-import com.eventPlatform.backend.service.FileStorageService;
+import com.eventPlatform.backend.service.*;
+import com.eventPlatform.backend.entity.EventView;
 
 
 import jakarta.transaction.Transactional;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 
-import com.eventPlatform.backend.service.XmlExportService;
-
-import com.eventPlatform.backend.service.JsonExportService;
-
 @RestController
-
 @RequestMapping("/api/events")
 public class EventController {
 
@@ -31,19 +28,23 @@ public class EventController {
     private final FileStorageService fileStorageService;
     private final XmlExportService xmlExportService;
     private final JsonExportService jsonExportService;
+    private final EventViewService  eventViewService;
+    private final UserService userService;
 
     public EventController(
             EventService eventService,
             FileStorageService fileStorageService,
             XmlExportService xmlExportService,
-            JsonExportService jsonExportService
-    ) {
+            JsonExportService jsonExportService,
+            EventViewService eventViewService,
+            UserService userService) {
         {
-
             this.eventService = eventService;
             this.fileStorageService = fileStorageService;
             this.xmlExportService = xmlExportService;
             this.jsonExportService = jsonExportService;
+            this.eventViewService = eventViewService;
+            this.userService = userService;
 
         }
     }
@@ -54,7 +55,21 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getEventById(@PathVariable Long id) {
+    public ResponseEntity<Event> getEventById(@PathVariable Long id, Authentication authentication) { //fix for frontend
+        if(authentication == null || !authentication.isAuthenticated()){
+            throw new RuntimeException("Not logged in");
+        }
+        Long userId = Long.parseLong(authentication.getName());
+
+        EventView eventView = eventViewService.getEventView(userId,id);
+        if(eventView == null){
+            EventView newEventView = new EventView(userService.findById(userId) , eventService.findById(id) , 1);
+            eventViewService.saveEventView(newEventView);
+        }else{
+            eventView.setVisitCount(eventView.getVisitCount()+1);
+            eventViewService.saveEventView(eventView);
+        }
+
         return eventService.getEventById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
