@@ -59,7 +59,6 @@ interface BackendEvent {
   media:Media[]
 }
 
-const API_URL = 'http://localhost:8080/api/events';
 
 function toEvent(event: BackendEvent): Event {
 
@@ -92,22 +91,43 @@ function toEvent(event: BackendEvent): Event {
   };
 }
 
-async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(url, { signal });
+async function fetchJson<T>(
+  url: string,
+  signal?: AbortSignal
+): Promise<T> {
+  const response = await fetch(url, {
+    signal,
+    credentials: "include",
+  });
 
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Request failed: ${response.status} ${response.statusText}`
+    );
   }
 
   return response.json() as Promise<T>;
 }
 
-export async function fetchEvents(signal?: AbortSignal): Promise<Event[]> {
-  const events = await fetchJson<BackendEvent[]>(API_URL, signal);
+export async function fetchEvents(
+  signal?: AbortSignal
+): Promise<Event[]> {
+  const events = await fetchJson<BackendEvent[]>(
+    "http://localhost:8080/api/events",
+    signal
+  );
+
   return events.map(toEvent);
 }
 
-export async function fetchEvent(eventId: string, signal?: AbortSignal): Promise<Event> {
-  const event = await fetchJson<BackendEvent>(`${API_URL}/${eventId}`, signal);
+export async function fetchEvent(
+  eventId: string,
+  signal?: AbortSignal
+): Promise<Event> {
+  const event = await fetchJson<BackendEvent>(
+    `http://localhost:8080/api/events/${eventId}`,
+    signal
+  );
+
   return toEvent(event);
 }
