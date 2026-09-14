@@ -39,6 +39,10 @@ public class AuthController {
         if(existingUser == null || !passwordEncoder.matches(request.getPassword(), existingUser.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
+        
+        if(!existingUser.getStatus().equals("APPROVED")){
+            throw new RuntimeException("User not approved");
+        }
 
         String token = jwtService.generateToken(existingUser);
 
