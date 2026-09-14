@@ -2,6 +2,7 @@ import { fetchEvents, type Event } from "../EventPage/eventApi";
 
 interface RecommendedEvent {
   eventId: number;
+  title:string;
   score: number;
 }
 
