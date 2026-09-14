@@ -37,6 +37,10 @@ public class MatrixFactorizationService {
         trainModel();
     }
 
+    public boolean hasUser(Long userId) {
+        return userIndex.containsKey(userId);
+    }
+
     private void createIndexes(List<Interaction> interactions) {
 
         int userCounter = 0;
@@ -206,20 +210,12 @@ public class MatrixFactorizationService {
 
         Integer uIndex = userIndex.get(userId);
         if (uIndex == null) {
-            System.out.println(
-                    "PROBLEM -> userId = " + userId +
-                            ", userIndex = " + uIndex
-            );
             return 0.0;
         }
         int u= uIndex;
 
         Integer iIndex = eventIndex.get(eventId);
         if (iIndex == null) {
-            System.out.println(
-                    "PROBLEM -> eventId = " + eventId +
-                            ", eventIndex = " + iIndex
-            );
             return 0.0;
         }
         int i = iIndex;
