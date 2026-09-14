@@ -9,7 +9,7 @@ interface RecommendedEvent {
 
 
 export async function fetchRecommendedEvents(signal?: AbortSignal): Promise<Event[]> {
-  const response = await fetch('http://localhost:8080/api/recommendations', {
+  const response = await fetch('http://localhost:8080/api/recommendation/recommendations', {
     credentials: "include",
     signal,
   });

@@ -36,6 +36,7 @@ export function Home() {
 
     return (
       <main className="page page--narrow">
+        <section><h1> Welcome {user?.role.toLowerCase()} ,{user?.firstName} {user?.lastName}</h1></section>
         <section
           className="recommendations"
           aria-labelledby="recommendations-title"

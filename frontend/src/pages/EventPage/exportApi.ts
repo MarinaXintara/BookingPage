@@ -1,7 +1,7 @@
-const API_URL = "http://localhost:8080/api/events";
+
 
 export async function exportXml() {
-  const response = await fetch(`${API_URL}/export/xml`, {
+  const response = await fetch(`http://localhost:8080/api/events/export/xml`, {
     method: "GET",
     credentials: "include",
   });
@@ -25,7 +25,7 @@ export async function exportXml() {
 }
 
 export async function exportJson() {
-  const response = await fetch(`${API_URL}/export/json`, {
+  const response = await fetch(`http://localhost:8080/api/events/export/json`, {
     method: "GET",
     credentials: "include",
   });
