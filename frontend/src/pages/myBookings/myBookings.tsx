@@ -71,8 +71,8 @@ export default function MyBookingsPage() {
             </tbody>
           </table>
           {user?.role === "ORGANIZER" ? (
-            <Link className="button button--secondary" to="/organiserBookings">
-              Event bookings
+            <Link className="button button--primary" to="/organiserBookings">
+              Requests
             </Link>
           ) : null}
         </div>

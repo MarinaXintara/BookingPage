@@ -23,6 +23,11 @@ export default function NavBar() {
             Messaging
           </NavLink>
         ) : null}
+        {user ? (
+          <NavLink className={linkClassName} to="/myBookings">
+            My Bookings
+          </NavLink>
+        ) : null}
         {user?.role === "ADMIN" ? (
           <NavLink className={linkClassName} to="/users">
             Users
@@ -30,7 +35,7 @@ export default function NavBar() {
         ) : null}
         {user?.role === "ORGANIZER" ? (
           <NavLink className={linkClassName} to="/organiserBookings">
-            Event bookings
+            Requests
           </NavLink>
         ) : null}
       </div>

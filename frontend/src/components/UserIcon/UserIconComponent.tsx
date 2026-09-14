@@ -62,16 +62,6 @@ export default function UserIconComponent() {
           <span className="user-email">{user.email}</span>
           <span className="user-role">{user.role}</span>
 
-          <Link to="/myBookings" onClick={() => setIsOpen(false)}>
-            My bookings
-          </Link>
-
-          {user.role === "ORGANIZER"  ? (
-            <Link to="/organiserBookings" onClick={() => setIsOpen(false)}>
-              Event bookings
-            </Link>
-          ) : null}
-
           <Button
             variant="secondary"
             disabled={isLoggingOut}
